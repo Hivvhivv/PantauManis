@@ -1,0 +1,10 @@
+node_modules
+.next
+.tmp
+src/generated
+prisma/migrations
+package-lock.json
+docs/PRD.md
+CLAUDE.md
+playwright-report
+test-results

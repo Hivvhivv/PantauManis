@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+coverage/
+next-env.d.ts
+*.tsbuildinfo
+
+# Rahasia
+.env
+.env.*
+!.env.example
+
+# Prisma Client hasil generate
+src/generated/
+
+# Data Postgres lokal (embedded-postgres) dan berkas sementara
+.tmp/
+
+# Playwright
+test-results/
+playwright-report/

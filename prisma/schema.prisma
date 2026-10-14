@@ -1,0 +1,177 @@
+// Skema PantauManis. Semua perubahan WAJIB lewat migration (`npm run db:migrate`).
+// Nama tabel/kolom snake_case, waktu disimpan UTC (timestamptz). Lihat ADR-002.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StaffRole {
+  superadmin
+  admin
+
+  @@map("staff_role")
+}
+
+/// Akun Admin dan Superadmin. Terpisah dari responden (ADR-003).
+model StaffUser {
+  id                 String    @id @default(uuid()) @db.Uuid
+  name               String    @db.VarChar(100)
+  email              String    @unique @db.VarChar(254)
+  passwordHash       String    @map("password_hash")
+  role               StaffRole
+  isActive           Boolean   @default(true) @map("is_active")
+  mustChangePassword Boolean   @default(true) @map("must_change_password")
+  lastLoginAt        DateTime? @map("last_login_at") @db.Timestamptz(3)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt          DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  sessions           StaffSession[]
+  createdRespondents Respondent[]
+
+  @@map("staff_users")
+}
+
+/// Sesi staf: berakhir setelah 2 jam tidak aktif atau 12 jam sejak login.
+model StaffSession {
+  id          String   @id @default(uuid()) @db.Uuid
+  staffUserId String   @map("staff_user_id") @db.Uuid
+  tokenHash   String   @unique @map("token_hash") @db.Char(64)
+  userAgent   String?  @map("user_agent") @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastSeenAt  DateTime @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  expiresAt   DateTime @map("expires_at") @db.Timestamptz(3)
+
+  staffUser StaffUser @relation(fields: [staffUserId], references: [id], onDelete: Cascade)
+
+  @@index([staffUserId])
+  @@map("staff_sessions")
+}
+
+enum AccessStatus {
+  active
+  inactive
+
+  @@map("access_status")
+}
+
+/// Akun Responden. Tidak menyimpan nama lengkap. Kode akses: lihat ADR-004.
+model Respondent {
+  id                  String       @id @default(uuid()) @db.Uuid
+  /// ID Responden / label penelitian, mis. R001.
+  label               String       @unique @map("respondent_code_label") @db.VarChar(20)
+  initials            String?      @db.VarChar(10)
+  /// HMAC-SHA256 kode akses (hex). Dipakai untuk login dan cek keunikan.
+  accessCodeHmac      String       @unique @map("access_code_hmac") @db.Char(64)
+  /// Kode akses terenkripsi AES-256-GCM (format v1:iv:tag:ciphertext).
+  accessCodeEncrypted String       @map("access_code_encrypted")
+  accessStatus        AccessStatus @default(active) @map("access_status")
+  consentAt           DateTime?    @map("consent_at") @db.Timestamptz(3)
+  startDate           DateTime?    @map("start_date") @db.Date
+  createdById         String?      @map("created_by") @db.Uuid
+  notes               String?      @db.VarChar(2000)
+  lastActiveAt        DateTime?    @map("last_active_at") @db.Timestamptz(3)
+  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt           DateTime?    @map("deleted_at") @db.Timestamptz(3)
+
+  createdBy StaffUser?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  sessions  RespondentSession[]
+
+  @@index([deletedAt, accessStatus])
+  @@map("respondents")
+}
+
+/// Sesi login kode akses: berlaku 30 hari sejak login.
+model RespondentSession {
+  id           String   @id @default(uuid()) @db.Uuid
+  respondentId String   @map("respondent_id") @db.Uuid
+  tokenHash    String   @unique @map("token_hash") @db.Char(64)
+  userAgent    String?  @map("user_agent") @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz(3)
+
+  respondent Respondent @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+
+  @@index([respondentId])
+  @@map("respondent_sessions")
+}
+
+enum LoginKind {
+  staff
+  code
+
+  @@map("login_kind")
+}
+
+/// Percobaan login, dasar rate limit per IP, per email, dan global (ADR-003).
+/// Tidak pernah menyimpan kode akses atau kata sandi.
+model LoginAttempt {
+  id        String    @id @default(uuid()) @db.Uuid
+  kind      LoginKind
+  ip        String    @db.VarChar(64)
+  /// HMAC email (khusus staf), bukan email asli.
+  emailHash String?   @map("email_hash") @db.Char(64)
+  success   Boolean
+  /// true jika percobaan ditolak oleh rate limit tanpa diperiksa.
+  blocked   Boolean   @default(false)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([kind, ip, createdAt])
+  @@index([kind, emailHash, createdAt])
+  @@index([kind, success, createdAt])
+  @@map("login_attempts")
+}
+
+/// Peringatan keamanan untuk banner Superadmin.
+model SecurityAlert {
+  id               String    @id @default(uuid()) @db.Uuid
+  type             String    @db.VarChar(50)
+  details          Json?
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  acknowledgedById String?   @map("acknowledged_by") @db.Uuid
+  acknowledgedAt   DateTime? @map("acknowledged_at") @db.Timestamptz(3)
+
+  @@index([type, createdAt])
+  @@map("security_alerts")
+}
+
+enum ActorType {
+  staff
+  respondent
+  system
+
+  @@map("actor_type")
+}
+
+/// Log audit. Hanya bisa ditambah: trigger di basis data menolak UPDATE dan DELETE.
+model AuditLog {
+  id         String    @id @default(uuid()) @db.Uuid
+  actorType  ActorType @map("actor_type")
+  actorId    String?   @map("actor_id") @db.Uuid
+  action     String    @db.VarChar(64)
+  targetType String?   @map("target_type") @db.VarChar(32)
+  targetId   String?   @map("target_id") @db.Uuid
+  ip         String?   @db.VarChar(64)
+  /// Detail tambahan. Tidak boleh berisi kode akses, kata sandi, token, atau jawaban kuesioner.
+  metadata   Json?
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([targetType, targetId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+/// Pengaturan penelitian (PRD FR-S-04). Nilai default diisi oleh migration.
+model StudySetting {
+  key       String   @id @db.VarChar(64)
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("study_settings")
+}
