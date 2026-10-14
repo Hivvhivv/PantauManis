@@ -30,5 +30,8 @@ export const historyQuerySchema = z.object({
   from: z.iso.date().optional().catch(undefined),
   to: z.iso.date().optional().catch(undefined),
   beverageTypeId: z.uuid().optional().catch(undefined),
+  /** Rentang cepat; diabaikan bila `from` diisi. Default: sejak hari ke-1. */
+  range: z.enum(["all", "7d", "2w", "1m", "3m", "1y"]).catch("all"),
+  sort: z.enum(["desc", "asc"]).catch("desc"),
 });
 export type HistoryQuery = z.infer<typeof historyQuerySchema>;

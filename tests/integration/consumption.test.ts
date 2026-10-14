@@ -360,3 +360,21 @@ describe("List Responden: hari ke-, kelengkapan, pretest (FR-A-02)", () => {
     expect(lowC.json.items.map((i: { label: string }) => i.label)).toEqual(["R003"]);
   });
 });
+
+describe("Riwayat: rentang cepat dan urutan (FR-R-04)", () => {
+  it("default sejak hari ke-1, terbaru dulu; 7 hari dan urutan terlama", async () => {
+    const r = await readyRespondent(-9); // 10 hari berjalan
+    const all = await call(history, { cookie: r.cookie });
+    expect(all.json.from).toBe(r.dayOne);
+    expect(all.json.days).toHaveLength(10);
+    expect(all.json.days[0].date).toBe(r.today);
+
+    const week = await call(history, {
+      cookie: r.cookie,
+      url: "/api/respondent/history?range=7d&sort=asc",
+    });
+    expect(week.json.days).toHaveLength(7);
+    expect(week.json.days[0].date).toBe(addDays(r.today, -6));
+    expect(week.json.days.at(-1).date).toBe(r.today);
+  });
+});

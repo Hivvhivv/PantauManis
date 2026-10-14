@@ -1859,6 +1859,149 @@ legend {
   border-radius: var(--radius-sm);
 }
 
+/* ---------- Riwayat ---------- */
+.filter-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+}
+.chip {
+  text-decoration: none;
+}
+.chip-on,
+.chip-on:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+.history-filters {
+  box-shadow: none;
+}
+.day-groups {
+  display: grid;
+  gap: 0.75rem;
+}
+.day-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+.day-group summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background: var(--bg-soft);
+  color: var(--primary-hover);
+  cursor: pointer;
+  list-style: none;
+}
+.day-group summary::-webkit-details-marker {
+  display: none;
+}
+.day-group .day-title strong {
+  color: var(--text);
+}
+.day-group .day-meta {
+  grid-column: 2 / 3;
+  color: var(--muted);
+}
+.day-group .chev {
+  grid-row: 1;
+  grid-column: 3;
+  transition: transform 0.15s;
+  transform: rotate(90deg);
+}
+.day-group[open] .chev {
+  transform: rotate(-90deg);
+}
+.day-group .sep {
+  color: var(--border);
+  margin-inline: 0.25rem;
+}
+@media (min-width: 720px) {
+  .day-group summary {
+    grid-template-columns: auto 1fr auto auto;
+  }
+  .day-group .day-meta {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .day-group .chev {
+    grid-column: 4;
+  }
+}
+.day-body {
+  display: grid;
+}
+.hist-item {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border);
+}
+.hist-item:first-child {
+  border-top: 0;
+}
+.kebab {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-decoration: none;
+}
+.kebab:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+.day-note {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+}
+.day-group .day-meta {
+  white-space: nowrap;
+}
+/* Kutipan di atas ilustrasi, tidak menimpanya. */
+.page-hero .hero-art {
+  padding-top: 3rem;
+}
+.page-hero .hero-quote {
+  max-width: 16rem;
+  text-align: right;
+}
+.h1-icon {
+  display: none;
+}
+@media (min-width: 720px) {
+  .h1-icon {
+    display: inline-flex;
+  }
+}
+@media (max-width: 420px) {
+  .hist-item {
+    grid-template-columns: 40px 1fr auto 28px;
+    gap: 0.6rem;
+    padding-inline: 0.75rem;
+  }
+  .hist-item .recent-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .hist-item .kebab {
+    width: 28px;
+  }
+}
+
 /* Kartu kode cetak */
 .cards {
   display: grid;

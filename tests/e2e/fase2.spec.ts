@@ -59,7 +59,7 @@ test("alur Responden: kode → persetujuan → pretest → catat → beranda →
     .getByRole("link", { name: /Riwayat/ })
     .first()
     .click();
-  await expect(page.getByText(/500 ml × 2 porsi/)).toBeVisible();
+  await expect(page.getByText(/2 porsi · 500 ml/)).toBeVisible();
 
   // Hapus catatan → hari kembali Belum diisi → tandai Nol.
   await page.getByRole("link", { name: /Ubah catatan Teh manis/ }).click();

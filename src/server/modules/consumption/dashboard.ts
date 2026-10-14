@@ -162,7 +162,9 @@ export async function getHistory(r: ReadyRespondent, query: HistoryQuery, now = 
   const today = localDateOf(now);
   const dayOne = fromDbDate(r.dayOneDate);
   let to = query.to && diffDays(query.to, today) >= 0 ? query.to : today;
-  let from = query.from ?? [addDays(to, -13), dayOne].sort().at(-1)!;
+  const RANGE_DAYS = { "7d": 7, "2w": 14, "1m": 30, "3m": 90, "1y": 365 } as const;
+  let from =
+    query.from ?? (query.range === "all" ? dayOne : addDays(to, -(RANGE_DAYS[query.range] - 1)));
   if (diffDays(from, dayOne) > 0) from = dayOne;
   if (diffDays(from, to) < 0) [from, to] = [to, from];
   if (diffDays(from, to) > 366) from = addDays(to, -366);
@@ -176,13 +178,17 @@ export async function getHistory(r: ReadyRespondent, query: HistoryQuery, now = 
     dayOne,
     logs: logs.map(lite),
     statuses: statuses.map((s) => ({ date: fromDbDate(s.date), status: s.status })),
-  })
-    .filter((d) => d.state !== "before" && d.state !== "future")
-    .reverse();
+  }).filter((d) => d.state !== "before" && d.state !== "future");
+  if (query.sort === "desc") days.reverse();
 
   return {
     from,
     to,
+    summary: {
+      totalDrinks: days.reduce((s, d) => s + d.drinks, 0),
+      totalSugar: Math.round(days.reduce((s, d) => s + d.sugarG, 0) * 10) / 10,
+      recordedDays: days.filter((d) => d.state === "filled" || d.state === "zero").length,
+    },
     days: days.map((d) => ({
       ...d,
       editable: editable.has(d.date),
