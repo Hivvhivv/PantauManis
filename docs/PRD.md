@@ -249,6 +249,7 @@ FR-A-04 Tombol "Lihat Hasil Responden"
 FR-A-05 Materi Edukasi
 • CRUD materi (judul, ringkasan, isi teks/gambar/video, sumber referensi, kuis), status Draf/Terbit, dan jadwal tampil (hari ke-N atau langsung).
 • Mengubah urutan materi dengan drag-and-drop.
+• Keputusan 2026-10-14 (ADR-008): isi Markdown sederhana dengan pratinjau; gambar diunggah ke Supabase Storage (bucket publik, JPG/PNG/WebP maks. 5 MB); video lewat tautan YouTube; kuis 0–3 soal pilihan ganda, boleh diulang (skor pertama dan terakhir disimpan); urutan juga bisa diubah dengan tombol ↑/↓ untuk pengguna keyboard.
 FR-A-06 Referensi Minuman
 • Tabel jenis minuman beserta ukuran standar (ml) dan perkiraan gula (gram per sajian) beserta sumbernya. Nilai ini dipakai untuk estimasi di pencatatan.
 • Perubahan nilai tidak mengubah catatan lama secara diam-diam; setiap catatan menyimpan nilai gula pada saat dibuat.

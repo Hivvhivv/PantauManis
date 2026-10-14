@@ -16,7 +16,9 @@ Sebelum pilot, peneliti wajib mengganti tiga hal yang masih berupa **CONTOH**: b
 
 **Fase 3a** selesai: target pribadi + umpan balik mingguan, posttest (hari ke-14–17), Dashboard Admin agregat, "Lihat Hasil Responden" (dimuat saat diklik, tercatat di audit), dan menu Superadmin **Pengaturan Penelitian** (durasi, masa tenggang, susulan, faktor gula, teks persetujuan).
 
-Fase berikutnya: 3b (edukasi) dan 4 (ekspor, log audit, uji coba); lihat PRD bagian 14.
+**Fase 3b** selesai: Materi Edukasi (Admin: Markdown + pratinjau, unggah gambar, video YouTube, kuis, jadwal hari ke-N, urutan drag-and-drop; Responden: daftar, baca, kuis yang bisa diulang). Gambar disimpan di folder lokal saat dev, di Supabase Storage saat production (ADR-008).
+
+Fase berikutnya: 4 (ekspor, log audit, uji coba); lihat PRD bagian 14.
 
 ## Menjalankan secara lokal
 

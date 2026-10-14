@@ -6,7 +6,7 @@ import { prisma } from "@/server/db";
 // TRUNCATE tidak memicu trigger baris append-only pada audit_logs.
 beforeEach(async () => {
   await prisma.$executeRawUnsafe(
-    'TRUNCATE "audit_logs", "login_attempts", "security_alerts", "respondent_sessions", "respondents", "staff_sessions", "staff_users" CASCADE',
+    'TRUNCATE "audit_logs", "login_attempts", "security_alerts", "respondent_sessions", "respondents", "staff_sessions", "staff_users", "education_materials" CASCADE',
   );
   await prisma.$executeRawUnsafe(`DELETE FROM "beverage_types" WHERE "name" LIKE 'UJI %'`);
 });

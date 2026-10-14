@@ -61,3 +61,18 @@ Atur di dashboard hosting, bukan di repositori:
 - Migration hanya dijalankan dari mesin pengembang lewat `db:deploy:prod`, tidak saat build.
 - Region project saat ini `ap-southeast-2` (Sydney). Pastikan sesuai ketentuan komite etik tentang lokasi data (ADR-002).
 - Jika kata sandi database pernah tersebar (chat, tangkapan layar, commit), reset di Project Settings → Database, lalu perbarui `.env.supabase` dan env di hosting.
+
+## Storage untuk materi edukasi (ADR-008)
+
+1. Di Supabase: **Storage → New bucket**, nama `edukasi`, centang **Public bucket**. Batasi tipe file (image/jpeg, image/png, image/webp) dan ukuran (5 MB) bila tersedia.
+2. Ambil **Project URL** dan **service_role key** (Project Settings → API). Service role key memberi akses penuh: simpan hanya di env server, jangan dibagikan atau ditempel di chat.
+3. Env server aplikasi (hosting):
+   ```dotenv
+   STORAGE_DRIVER="supabase"
+   SUPABASE_URL="https://<project-ref>.supabase.co"
+   SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"
+   SUPABASE_STORAGE_BUCKET="edukasi"
+   ```
+4. Uji: buka **Materi Edukasi → Tambah materi**, unggah gambar kecil, lalu pastikan pratinjau tampil dan URL gambar mengarah ke `<project>.supabase.co/storage/v1/object/public/edukasi/...`.
+
+Tanpa `STORAGE_DRIVER=supabase`, aplikasi memakai folder lokal (cocok untuk dev, **tidak** untuk hosting serverless karena file hilang saat redeploy).

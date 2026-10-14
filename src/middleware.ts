@@ -8,6 +8,7 @@ const RESPONDENT_PATHS = [
   "/riwayat",
   "/target",
   "/posttest",
+  "/edukasi",
 ];
 
 /**
@@ -38,5 +39,6 @@ export const config = {
     "/riwayat/:path*",
     "/target/:path*",
     "/posttest/:path*",
+    "/edukasi/:path*",
   ],
 };

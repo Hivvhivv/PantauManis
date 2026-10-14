@@ -8,6 +8,7 @@ const ITEMS: { href: string; label: string; short?: string; icon: IconName }[] =
   { href: "/beranda", label: "Beranda", icon: "home" },
   { href: "/catat", label: "Catat Minuman", short: "Catat", icon: "cup" },
   { href: "/riwayat", label: "Riwayat", icon: "clock" },
+  { href: "/edukasi", label: "Edukasi", icon: "book" },
   { href: "/target", label: "Target", icon: "target" },
 ];
 

@@ -32,6 +32,10 @@ export const AuditAction = {
   GoalSet: "goal.set",
   RespondentResultsViewed: "respondent.results_viewed",
   SettingsUpdated: "settings.updated",
+  MaterialCreated: "education.created",
+  MaterialUpdated: "education.updated",
+  MaterialDeleted: "education.deleted",
+  MaterialsReordered: "education.reordered",
 } as const;
 
 export type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];
@@ -41,7 +45,8 @@ export type Actor = { type: ActorType; id: string | null; ip: string | null };
 export type AuditEntry = {
   actor: Actor;
   action: AuditActionName;
-  targetType?: "staff_user" | "respondent" | "security_alert" | "beverage_type";
+  targetType?:
+    "staff_user" | "respondent" | "security_alert" | "beverage_type" | "education_material";
   targetId?: string | null;
   /** Jangan pernah memasukkan kode akses, kata sandi, token, atau jawaban kuesioner. */
   metadata?: Record<string, string | number | boolean | null | string[]>;

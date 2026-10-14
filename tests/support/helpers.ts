@@ -16,7 +16,7 @@ export async function call(
     url?: string;
     body?: unknown;
     cookie?: string;
-    params?: Record<string, string>;
+    params?: Record<string, string | string[]>;
     headers?: Record<string, string>;
     form?: FormData;
   } = {},

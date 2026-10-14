@@ -89,6 +89,7 @@ model Respondent {
   dailyStatuses   DailyStatus[]
   responses       QuestionnaireResponse[]
   goals           Goal[]
+  educationProgress EducationProgress[]
 
   @@index([deletedAt, accessStatus])
   @@map("respondents")
@@ -378,4 +379,77 @@ model Goal {
 
   @@index([respondentId, validFrom])
   @@map("goals")
+}
+
+enum MaterialStatus {
+  draft
+  published
+
+  @@map("material_status")
+}
+
+/// Materi edukasi (FR-A-05). Isi dalam Markdown; gambar di storage, video lewat tautan YouTube.
+model EducationMaterial {
+  id          String         @id @default(uuid()) @db.Uuid
+  title       String         @db.VarChar(150)
+  summary     String         @db.VarChar(300)
+  /// Isi materi dalam Markdown (dirender tanpa HTML mentah).
+  body        String
+  icon        String         @default("📘") @db.VarChar(16)
+  /// Kunci file gambar di storage (mis. edukasi/<uuid>.webp).
+  imageKey    String?        @map("image_key") @db.VarChar(200)
+  imageAlt    String?        @map("image_alt") @db.VarChar(200)
+  /// Tautan video YouTube (opsional).
+  videoUrl    String?        @map("video_url") @db.VarChar(300)
+  source      String?        @db.VarChar(500)
+  /// Kosong = langsung terbuka; N = terbuka mulai hari ke-N penelitian.
+  unlockDay   Int?           @map("unlock_day")
+  sortOrder   Int            @default(0) @map("sort_order")
+  status      MaterialStatus @default(draft)
+  createdById String?        @map("created_by") @db.Uuid
+  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt   DateTime?      @map("deleted_at") @db.Timestamptz(3)
+
+  questions EducationQuizQuestion[]
+  progress  EducationProgress[]
+
+  @@index([status, sortOrder])
+  @@map("education_materials")
+}
+
+/// Soal kuis pilihan ganda (0–3 per materi), satu jawaban benar.
+model EducationQuizQuestion {
+  id           String @id @default(uuid()) @db.Uuid
+  materialId   String @map("material_id") @db.Uuid
+  order        Int
+  text         String @db.VarChar(500)
+  /// Daftar opsi jawaban (2–4 teks).
+  options      Json
+  correctIndex Int    @map("correct_index")
+
+  material EducationMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([materialId, order])
+  @@map("education_quiz_questions")
+}
+
+/// Aktivitas edukasi per responden per materi (FR-R-05).
+model EducationProgress {
+  id             String    @id @default(uuid()) @db.Uuid
+  respondentId   String    @map("respondent_id") @db.Uuid
+  materialId     String    @map("material_id") @db.Uuid
+  readAt         DateTime  @default(now()) @map("read_at") @db.Timestamptz(3)
+  /// Skor kuis percobaan pertama dan terakhir (0–100).
+  firstQuizScore Float?    @map("first_quiz_score")
+  lastQuizScore  Float?    @map("last_quiz_score")
+  quizAttempts   Int       @default(0) @map("quiz_attempts")
+  lastAnswers    Json?     @map("last_answers")
+  lastQuizAt     DateTime? @map("last_quiz_at") @db.Timestamptz(3)
+
+  respondent Respondent        @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+  material   EducationMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@unique([respondentId, materialId])
+  @@map("education_progress")
 }

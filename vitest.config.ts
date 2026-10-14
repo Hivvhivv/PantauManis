@@ -1,3 +1,4 @@
+import os from "node:os";
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 
@@ -13,6 +14,9 @@ const testEnv = {
   APP_URL: "http://localhost:3000",
   ACCESS_CODE_HMAC_SECRET: Buffer.alloc(32, 1).toString("base64"),
   ACCESS_CODE_ENC_KEY: Buffer.alloc(32, 2).toString("base64"),
+  // Unggahan media saat test disimpan di folder sementara (driver "local").
+  PM_UPLOAD_DIR: path.join(os.tmpdir(), "pantaumanis-test-uploads"),
+  STORAGE_DRIVER: "local",
 };
 
 export default defineConfig({

@@ -4,6 +4,7 @@ import type { ReadyRespondent } from "@/server/auth/guards";
 import { notFound } from "@/server/http/errors";
 import { AuditAction, writeAudit, type Actor } from "@/server/modules/audit";
 import { getDashboard } from "@/server/modules/consumption/dashboard";
+import { educationActivity } from "@/server/modules/education/service";
 import { getGoalState } from "@/server/modules/goals/service";
 import type { QuestionOption } from "@/server/modules/questionnaires/scoring";
 import { fromDbDate, toLocalDateTime } from "@/server/modules/study/days";
@@ -56,8 +57,9 @@ export async function getRespondentResults(id: string, actor: Actor) {
   }
 
   const ready = r as ReadyRespondent;
-  const [dashboard, goals, logs] = await Promise.all([
+  const [dashboard, education, goals, logs] = await Promise.all([
     getDashboard(ready, "2w"),
+    educationActivity(id),
     getGoalState(ready),
     prisma.consumptionLog.findMany({
       where: { respondentId: id, deletedAt: null },
@@ -72,6 +74,7 @@ export async function getRespondentResults(id: string, actor: Actor) {
     dayOne: fromDbDate(r.dayOneDate),
     dashboard,
     goals,
+    education,
     logs: logs.map((l) => ({
       id: l.id,
       consumedAt: toLocalDateTime(l.consumedAt).replace("T", " "),

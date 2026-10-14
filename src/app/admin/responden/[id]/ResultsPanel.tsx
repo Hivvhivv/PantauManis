@@ -171,6 +171,46 @@ function StartedResults({ data }: { data: Extract<RespondentResults, { started: 
         </ul>
       )}
 
+      <h3 className="chart-title">Edukasi ({data.education.length} materi dibaca)</h3>
+
+      {data.education.length === 0 ? (
+        <p className="muted small" style={{ margin: 0 }}>
+          Belum membaca materi edukasi.
+        </p>
+      ) : (
+        <div className="table-wrap">
+          <table style={{ minWidth: 0 }}>
+            <thead>
+              <tr>
+                <th scope="col">Materi</th>
+
+                <th scope="col">Dibaca</th>
+
+                <th scope="col">Kuis (pertama / terakhir)</th>
+
+                <th scope="col">Percobaan</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {data.education.map((e) => (
+                <tr key={e.title}>
+                  <td>{e.title}</td>
+
+                  <td className="small">{formatDateTime(e.readAt)}</td>
+
+                  <td>
+                    {e.firstQuizScore === null ? "—" : `${e.firstQuizScore} / ${e.lastQuizScore}`}
+                  </td>
+
+                  <td>{e.quizAttempts}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       <h3 className="chart-title">Log konsumsi ({data.logs.length})</h3>
       <div className="table-wrap">
         <table>
