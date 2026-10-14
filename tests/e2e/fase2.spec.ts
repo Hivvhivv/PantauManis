@@ -46,7 +46,7 @@ test("alur Responden: kode → persetujuan → pretest → catat → beranda →
   await page.getByRole("radio", { name: "Teh manis" }).check();
   await page.getByRole("button", { name: /Gelas besar/ }).click();
   await page.getByRole("button", { name: "Tambah porsi" }).click();
-  await expect(page.getByText(/Perkiraan gula: ±80 g/)).toBeVisible();
+  await expect(page.locator("#estimate-total")).toHaveText("±80 g");
   await page.getByRole("button", { name: "Simpan" }).click();
 
   await expect(page).toHaveURL(/\/beranda\?tersimpan=1$/);

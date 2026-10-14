@@ -10,6 +10,7 @@ const PATHS = {
   info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zm0-10v6m0-9h.01",
   logout: "M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10",
   chevron: "M9 6l6 6-6 6",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm9 3-4.3-4.3",
 } as const;
 
 export type IconName = keyof typeof PATHS;

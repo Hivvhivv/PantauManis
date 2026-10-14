@@ -20,12 +20,12 @@ export default async function EditLogPage({ params }: { params: Promise<{ id: st
     if (e instanceof AppError && e.status === 404) notFound();
     throw e;
   });
-  const { nowLocal: _now, today: _today, ...data } = await logFormData(r);
-  void _now;
+  const { today: _today, todayRecorded: _rec, ...data } = await logFormData(r);
   void _today;
+  void _rec;
 
   return (
-    <RespondentShell>
+    <RespondentShell wide label={r.label}>
       <p className="small" style={{ margin: 0 }}>
         <Link href="/riwayat">← Riwayat</Link>
       </p>

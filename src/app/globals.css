@@ -1315,6 +1315,245 @@ legend {
   }
 }
 
+/* ---------- Catat Minuman ---------- */
+.page-hero {
+  min-height: 0;
+}
+@media (min-width: 960px) {
+  .page-hero {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+.log-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+.log-col {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 960px) {
+  .log-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.step-head {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+.step-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+.step-head p {
+  margin: 0.15rem 0 0;
+}
+.step-badge {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+}
+.search input {
+  border: 0;
+  padding-left: 0;
+  background: transparent;
+}
+.search input:focus {
+  outline: none;
+}
+.search:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.tiles.big {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+.tiles.big .tile label {
+  min-height: 112px;
+  background: var(--bg-soft);
+  border-color: transparent;
+}
+.tiles.big .emoji {
+  font-size: 2.3rem;
+}
+.tiles.big .tile input:checked + label {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+.fav-title {
+  margin: 0;
+  font-size: 1rem;
+}
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.6rem;
+}
+.fav {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0.7rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+}
+.fav .emoji {
+  font-size: 1.7rem;
+}
+.fav[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.estimate-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: var(--success-bg);
+}
+.stat-icon.big {
+  width: 52px;
+  height: 52px;
+  background: var(--surface);
+  color: var(--accent);
+}
+.est-big {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.est-big small {
+  font-size: 1rem;
+}
+.est-total {
+  border-left: 1px solid var(--border);
+  padding-left: 1rem;
+}
+.est-mid {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+.selected-bev {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+.sel-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.9rem;
+  background: var(--surface);
+}
+.size-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.5rem;
+}
+.size {
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.55rem 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.size .small {
+  color: var(--muted);
+}
+.size[aria-pressed="true"] {
+  border: 1.5px solid var(--primary);
+  background: var(--primary-soft);
+}
+.ready-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--success-bg);
+}
+.zero-card {
+  display: grid;
+  gap: 0.75rem;
+  align-items: center;
+}
+@media (min-width: 720px) {
+  .zero-card {
+    grid-template-columns: 1fr auto;
+  }
+  .zero-card .btn-block {
+    width: auto;
+  }
+}
+
+/* Ponsel: urutan pilih jenis → isi detail → perkiraan gula. */
+@media (max-width: 959px) {
+  .log-col {
+    display: contents;
+  }
+  .log-step1 {
+    order: 1;
+  }
+  .log-step2 {
+    order: 2;
+  }
+  .ready-card {
+    order: 3;
+  }
+  .log-est {
+    order: 4;
+  }
+}
+
 /* Kartu kode cetak */
 .cards {
   display: grid;
