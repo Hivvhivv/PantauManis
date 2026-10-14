@@ -979,6 +979,342 @@ legend {
   white-space: nowrap;
 }
 
+/* ---------- Dashboard Responden lebar penuh ---------- */
+.resp-header .inner.wide,
+.resp-main.wide {
+  max-width: 1200px;
+}
+.resp-main.wide {
+  padding-inline: 1rem;
+}
+@media (min-width: 720px) {
+  .resp-main.wide {
+    padding-inline: 1.5rem;
+  }
+}
+.icon {
+  flex-shrink: 0;
+}
+.resp-nav a {
+  align-items: center;
+}
+.account {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.account-chip {
+  display: none;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.75rem 0.2rem 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 800;
+}
+@media (min-width: 720px) {
+  .account-chip {
+    display: inline-flex;
+  }
+}
+
+/* Sapaan */
+.dash-hero {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.5rem 1.25rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: linear-gradient(120deg, var(--primary-soft), var(--bg-soft) 70%);
+}
+.dash-hero h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+.lead-text {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.hero-progress {
+  box-shadow: none;
+  display: grid;
+  gap: 0.35rem;
+}
+.bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  overflow: hidden;
+}
+.bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.hero-art {
+  display: none;
+  position: relative;
+}
+.hero-art .illustration {
+  max-width: 230px;
+  margin: 0;
+}
+.hero-quote {
+  position: absolute;
+  right: 0;
+  top: 0.5rem;
+  margin: 0;
+  font-style: italic;
+  font-weight: 700;
+  color: var(--primary-hover);
+  line-height: 1.4;
+}
+@media (min-width: 960px) {
+  .dash-hero {
+    grid-template-columns: 1.3fr 1fr 1fr;
+    padding: 1.75rem 2rem;
+  }
+  .hero-art {
+    display: block;
+  }
+}
+
+/* Ringkasan */
+.summary-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) {
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.stat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+.stat-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.stat-ring {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.ring-text {
+  font-size: 16px;
+  font-weight: 800;
+  fill: var(--text);
+}
+.btn-lg {
+  min-height: 52px;
+  font-size: 1.05rem;
+}
+
+/* Grid kartu */
+.dash-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  /* Kartu bersebelahan sama tinggi. */
+  align-items: stretch;
+}
+.dash-grid > * {
+  margin-top: 0 !important;
+}
+@media (min-width: 960px) {
+  .dash-grid.two-one {
+    grid-template-columns: 2fr 1fr;
+  }
+  .dash-grid.one-one {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.chart-title {
+  margin: 0;
+  font-size: 1rem;
+}
+.chart-box.small {
+  height: 170px;
+}
+.donut {
+  position: relative;
+  height: 200px;
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.donut-center strong {
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+.legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+.legend-list li {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+.legend-list .swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.legend-list .num {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Kalender mingguan */
+.week-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.45rem;
+  text-align: center;
+}
+.week-calendar .wd {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.wc {
+  display: grid;
+  place-items: center;
+  gap: 0.15rem;
+  padding: 0.45rem 0;
+  min-height: 52px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 800;
+}
+.wc .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+}
+.wc.filled .dot {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.wc.zero .dot {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.wc.empty {
+  border-style: dashed;
+  border-color: var(--muted);
+}
+.wc.future {
+  background: var(--bg-soft);
+  color: var(--muted);
+}
+.wc.future .dot {
+  opacity: 0.5;
+}
+.wc.today {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+.wc.today .dot {
+  border-color: var(--primary-text);
+  background: var(--primary-text);
+}
+.today-link {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  color: var(--text);
+  text-decoration: none;
+}
+.today-link:hover {
+  color: var(--text);
+  background: var(--primary-soft);
+}
+
+/* Aktivitas terbaru */
+.recent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.recent-list li {
+  display: grid;
+  grid-template-columns: 44px 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.recent-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+}
+.recent-meta {
+  text-align: right;
+  white-space: nowrap;
+}
+@media (max-width: 420px) {
+  .recent-list li {
+    grid-template-columns: 40px 1fr auto;
+  }
+  .recent-list li > :last-child {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}
+
 /* Kartu kode cetak */
 .cards {
   display: grid;

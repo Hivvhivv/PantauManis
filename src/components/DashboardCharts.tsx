@@ -9,7 +9,6 @@ import {
   Chart,
   DoughnutController,
   Filler,
-  Legend,
   LinearScale,
   LineController,
   LineElement,
@@ -17,6 +16,7 @@ import {
   Tooltip,
   type ChartConfiguration,
 } from "chart.js";
+import { categoryColor } from "@/lib/palette";
 
 Chart.register(
   LineController,
@@ -29,72 +29,74 @@ Chart.register(
   CategoryScale,
   LinearScale,
   Tooltip,
-  Legend,
   Filler,
 );
 
 const css = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-const PALETTE = [
-  "#9c5b2e",
-  "#8a9a5b",
-  "#d39a5f",
-  "#c7b299",
-  "#6e5c4e",
-  "#e3b98f",
-  "#b5c28a",
-  "#7e4722",
-];
-
-function useChart(make: () => ChartConfiguration) {
+function useChart(make: () => ChartConfiguration, deps: unknown[]) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     if (!ref.current) return;
     Chart.defaults.font.family = css("--font-nunito") || "system-ui";
     Chart.defaults.color = css("--muted");
+    Chart.defaults.borderColor = css("--border");
     const chart = new Chart(ref.current, make());
     return () => chart.destroy();
-  }, [make]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- grafik dibuat ulang hanya bila data berubah
+  }, deps);
   return ref;
 }
 
-/** Grafik garis: perkiraan gula per hari/minggu. Nilai null = Belum diisi (tidak digambar). */
+const grid = { color: () => css("--border") };
+
+/** Grafik garis: perkiraan gula. Nilai null = Belum diisi (celah, tidak digambar sebagai 0). */
 export function SugarLineChart({
   labels,
   values,
-  label,
 }: {
   labels: string[];
   values: (number | null)[];
-  label: string;
 }) {
-  const ref = useChart(() => ({
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label,
-          data: values,
-          borderColor: css("--primary"),
-          backgroundColor: css("--primary-soft"),
-          fill: true,
-          tension: 0.3,
-          spanGaps: false,
-          // Titik terisi dan cukup besar: di awal periode sering hanya ada satu titik.
-          pointRadius: 5,
-          pointBackgroundColor: css("--primary"),
+  const ref = useChart(
+    () => ({
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Perkiraan gula (g)",
+            data: values,
+            borderColor: css("--primary"),
+            backgroundColor: "rgba(201, 111, 59, 0.12)",
+            fill: true,
+            tension: 0.35,
+            spanGaps: false,
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: css("--surface"),
+            pointBorderColor: css("--primary"),
+            pointBorderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: (c) => ` ±${c.parsed.y} g (perkiraan)` } },
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, title: { display: true, text: "gram (perkiraan)" } } },
-    },
-  }));
+        scales: {
+          y: { beginAtZero: true, grid },
+          x: { grid: { display: false } },
+        },
+      },
+    }),
+    [labels.join(), values.join()],
+  );
   return (
     <div className="chart-box">
       <canvas ref={ref} aria-hidden="true" />
@@ -109,45 +111,79 @@ export function DrinksBarChart({
   labels: string[];
   values: (number | null)[];
 }) {
-  const ref = useChart(() => ({
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        { label: "Jumlah minuman", data: values, backgroundColor: css("--drink"), borderRadius: 6 },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
-    },
-  }));
+  const ref = useChart(
+    () => ({
+      type: "bar",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Jumlah minuman",
+            data: values,
+            backgroundColor: css("--accent"),
+            borderRadius: 6,
+            maxBarThickness: 36,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 }, grid },
+          x: { grid: { display: false } },
+        },
+      },
+    }),
+    [labels.join(), values.join()],
+  );
   return (
-    <div className="chart-box">
+    <div className="chart-box small">
       <canvas ref={ref} aria-hidden="true" />
     </div>
   );
 }
 
-export function CompositionChart({ items }: { items: { beverage: string; servings: number }[] }) {
-  const ref = useChart(() => ({
-    type: "doughnut",
-    data: {
-      labels: items.map((i) => i.beverage),
-      datasets: [{ data: items.map((i) => i.servings), backgroundColor: PALETTE, borderWidth: 0 }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "62%",
-      plugins: { legend: { position: "right", labels: { boxWidth: 12 } } },
-    },
-  }));
+/** Donat komposisi jenis minuman; total ditampilkan di tengah, legenda di HTML. */
+export function CompositionChart({
+  items,
+  total,
+}: {
+  items: { beverage: string; servings: number }[];
+  total: number;
+}) {
+  const ref = useChart(
+    () => ({
+      type: "doughnut",
+      data: {
+        labels: items.map((i) => i.beverage),
+        datasets: [
+          {
+            data: items.map((i) => i.servings),
+            backgroundColor: items.map((_, i) => categoryColor(i)),
+            borderColor: css("--surface"),
+            borderWidth: 3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "64%",
+        plugins: { legend: { display: false } },
+      },
+    }),
+    [items.map((i) => `${i.beverage}:${i.servings}`).join()],
+  );
   return (
-    <div className="chart-box">
+    <div className="donut">
       <canvas ref={ref} aria-hidden="true" />
+      <div className="donut-center" aria-hidden="true">
+        <span className="small muted">Total</span>
+        <strong>{total}</strong>
+        <span className="small muted">minuman</span>
+      </div>
     </div>
   );
 }

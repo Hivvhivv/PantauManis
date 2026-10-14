@@ -34,11 +34,15 @@ npm run dev                   # http://localhost:3000
 
 Data Postgres lokal disimpan di `%LOCALAPPDATA%\pantaumanis` (Windows) atau `~/.local/share/pantaumanis`, bisa diubah lewat `PM_PG_DATA_DIR`. Lokasinya sengaja di luar folder proyek karena Windows Controlled Folder Access dapat memblokir Postgres menulis di bawah Documents.
 
+## Database production (Supabase)
+
+Lihat [docs/runbook/deploy-supabase.md](docs/runbook/deploy-supabase.md): kredensial disimpan di `.env.supabase`, lalu `npm run db:deploy:prod` dan `npm run superadmin:create:prod`. `.env` lokal tidak tersentuh.
+
 ## Test
 
 ```bash
 npm test               # unit + integration (menyalakan Postgres test sendiri di port 54330)
-npm run test:e2e       # Playwright (menyalakan Postgres di 54331 dan next dev di 3100)
+npm run test:e2e       # Playwright (Postgres di 54331, build produksi di port 3100)
 npm run lint           # ESLint + typecheck
 ```
 

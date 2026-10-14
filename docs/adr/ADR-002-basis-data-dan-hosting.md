@@ -1,6 +1,6 @@
 # ADR-002: Pemilihan basis data dan hosting (termasuk lokasi data)
 
-- Status: Diterima untuk basis data dan ORM; **Diusulkan** untuk penyedia hosting dan lokasi data (menunggu ketentuan komite etik)
+- Status: Diterima untuk basis data, ORM, dan penyedia database (Supabase, 2026-10-14); lokasi data **menunggu ketentuan komite etik**
 - Tanggal: 2026-10-14
 - Rujukan: PRD bagian 9 (Model Data), 11 (Ketersediaan, Konsistensi waktu), 12, 14 (Pertanyaan terbuka: lokasi server)
 
@@ -39,3 +39,11 @@ Mesin pengembangan saat ini tidak memiliki Docker maupun PostgreSQL terpasang.
 - Constraint penting (keunikan kode, append-only audit) dijaga basis data, bukan hanya oleh kode aplikasi.
 - Integration test berjalan di PostgreSQL asli, sehingga lebih lambat dibanding mock, tetapi lebih jujur.
 - Pemilihan region produksi tetap terbuka dan harus diputuskan sebelum rekrutmen responden (Fase 4).
+
+## Pembaruan 2026-10-14: Supabase sebagai PostgreSQL production
+
+- Supabase dipakai **hanya sebagai PostgreSQL terkelola**: tanpa supabase-js dan tanpa Supabase Auth (autentikasi tetap milik aplikasi, ADR-003).
+- Runtime memakai `DATABASE_URL` (transaction pooler, port 6543, `pgbouncer=true`); Prisma CLI memakai `DIRECT_URL` (session pooler, port 5432) lewat `prisma.config.ts`, karena Prisma 7 tidak lagi mendukung `directUrl` di skema.
+- Koneksi wajib terenkripsi (`sslmode`); tanpanya driver `pg` tersambung tanpa SSL.
+- Perintah ke production dijalankan dengan skrip `:prod` yang membaca `.env.supabase`, bukan `.env` lokal. Langkah lengkap: `docs/runbook/deploy-supabase.md`.
+- **Lokasi data:** project saat ini di region `ap-southeast-2` (Sydney, Australia), bukan Indonesia/Singapura. Perlu dikonfirmasi dengan ketentuan komite etik sebelum rekrutmen; memindah region berarti membuat project Supabase baru dan menjalankan ulang `db:deploy:prod`.

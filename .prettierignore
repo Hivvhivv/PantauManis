@@ -9,3 +9,6 @@ docs/PRD.md
 CLAUDE.md
 playwright-report
 test-results
+# Folder alat/asisten pihak ketiga (bukan kode aplikasi)
+.agents
+.aider-desk

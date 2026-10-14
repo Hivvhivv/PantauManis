@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon, type IconName } from "./Icon";
 
-const ITEMS = [
-  { href: "/beranda", label: "Beranda", icon: "🏠" },
-  { href: "/catat", label: "Catat", icon: "＋" },
-  { href: "/riwayat", label: "Riwayat", icon: "📋" },
+const ITEMS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/beranda", label: "Beranda", icon: "home" },
+  { href: "/catat", label: "Catat Minuman", icon: "cup" },
+  { href: "/riwayat", label: "Riwayat", icon: "clock" },
 ];
 
 /** Di ponsel tampil sebagai bar bawah; di layar lebar di header. */
@@ -18,7 +19,7 @@ export function RespondentNav() {
         const active = path === i.href || path.startsWith(`${i.href}/`);
         return (
           <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined}>
-            <span aria-hidden="true">{i.icon}</span>
+            <Icon name={i.icon} />
             <span>{i.label}</span>
           </Link>
         );

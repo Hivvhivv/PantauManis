@@ -13,6 +13,7 @@ import {
 } from "@/server/modules/study/days";
 import {
   buildDays,
+  completeness,
   composition,
   rangeDates,
   RANGES,
@@ -99,6 +100,15 @@ export async function getDashboard(r: ReadyRespondent, range: RangeKey, now = ne
     statuses: st,
   })[0]!;
 
+  // Aktivitas terbaru: 5 catatan terakhir milik responden ini, tanpa batas rentang.
+  const recentRows = await prisma.consumptionLog.findMany({
+    where: { respondentId: r.id, deletedAt: null },
+    include: { beverageType: { select: { name: true, icon: true } } },
+    orderBy: { consumedAt: "desc" },
+    take: 5,
+  });
+  const editable = new Set(editableDates(today, dayOne, settings.backfillDays));
+
   const recorded = days.filter((d) => d.state === "filled" || d.state === "zero");
   const totalDrinks = days.reduce((s, d) => s + d.drinks, 0);
   const totalSugar = Math.round(days.reduce((s, d) => s + d.sugarG, 0) * 10) / 10;
@@ -116,6 +126,23 @@ export async function getDashboard(r: ReadyRespondent, range: RangeKey, now = ne
     weeks: range === "1y" ? weekly(days) : null,
     calendar,
     composition: composition(all.filter((l) => inRange(l.localDate))),
+    completeness: completeness({
+      dayOne,
+      today,
+      durationDays: settings.durationDays,
+      statusDates: st.map((s) => s.date),
+    }),
+    recent: recentRows.map((l) => ({
+      id: l.id,
+      beverage: l.beverageType.name,
+      icon: l.beverageType.icon,
+      volumeMl: l.volumeMl,
+      servings: l.servings,
+      sugarG: l.sugarGSnapshot,
+      date: fromDbDate(l.localDate),
+      time: toLocalDateTime(l.consumedAt).slice(11),
+      editable: editable.has(fromDbDate(l.localDate)),
+    })),
     summary: {
       totalDrinks,
       totalSugar,

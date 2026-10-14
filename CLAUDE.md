@@ -19,6 +19,7 @@ Jalankan semua test: npm test (unit + integration), npm run test:e2e (Playwright
 Lint & format: npm run lint (ESLint + tsc), npm run format
 Migration: npm run db:migrate -- --name <nama> (dev), npm run db:deploy (produksi)
 Superadmin pertama / reset kata sandi Superadmin: lihat docs/runbook/superadmin-cli.md
+Production (Supabase): npm run db:status:prod / db:deploy:prod / superadmin:create:prod, membaca .env.supabase (docs/runbook/deploy-supabase.md). Jangan menjalankan perintah :prod tanpa diminta.
 Struktur kode
 src/app/** halaman dan Route Handlers (tipis); src/server/modules/** logika bisnis; src/server/auth/** sesi, guard, rate limit.
 Setiap Route Handler dibungkus route() dan memanggil requireStaff/requireSuperadmin/requireRespondent.
