@@ -9,6 +9,7 @@ const config = [
     ignores: [
       "node_modules/**",
       ".next/**",
+      ".next-e2e/**",
       ".tmp/**",
       "src/generated/**",
       "next-env.d.ts",

@@ -5,7 +5,7 @@ import { staffForPage } from "@/server/auth/page-guards";
 import { AppError } from "@/server/http/errors";
 import { respondentHistory } from "@/server/modules/audit";
 import { getRespondentDetail } from "@/server/modules/respondents/service";
-import { formatDateTime, formatPlainDate } from "@/lib/format";
+import { formatDateTime, formatPlainDate, studyDayLabel } from "@/lib/format";
 import { CodeReveal } from "../CodeReveal";
 import { RespondentActions } from "../RespondentActions";
 
@@ -75,10 +75,18 @@ export default async function RespondentDetailPage({
             </dd>
             <dt>Tanggal mulai</dt>
             <dd>{formatPlainDate(r.startDate)}</dd>
+            <dt>Persetujuan</dt>
+            <dd>{r.consentAt ? formatDateTime(r.consentAt) : "Belum"}</dd>
             <dt>Tanggal pretest</dt>
-            <dd>Belum</dd>
+            <dd>{r.dayOneDate ? formatPlainDate(r.dayOneDate) : "Belum"}</dd>
             <dt>Hari ke-</dt>
-            <dd>—</dd>
+            <dd>{studyDayLabel(r.progress)}</dd>
+            <dt>Kelengkapan</dt>
+            <dd>
+              {r.progress.completeness
+                ? `${r.progress.completeness.filled}/${r.progress.completeness.elapsed} hari`
+                : "—"}
+            </dd>
             <dt>Posttest</dt>
             <dd>Belum</dd>
             <dt>Terakhir aktif</dt>

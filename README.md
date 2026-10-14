@@ -10,7 +10,11 @@ Website intervensi self-monitoring konsumsi minuman manis untuk dewasa muda, dip
 
 **Fase 1 (Fondasi)** selesai: skema basis data dan migration, autentikasi dua jalur (staf dengan email + kata sandi, responden dengan kode akses), Manajemen Pengguna Superadmin dengan dropdown peran, serta List Responden dengan pembuatan kode (tambah, massal, impor CSV, unduh daftar, cetak kartu, reset, nonaktifkan, hapus lunak).
 
-Fase berikutnya (persetujuan, pretest, pencatatan, dashboard, ekspor) belum dikerjakan; lihat PRD bagian 14.
+**Fase 2 (Inti Responden)** selesai: persetujuan, pretest (draf otomatis, terkunci setelah dikirim), pencatatan minuman termasuk "Nol", Dashboard Responden (grafik 1 minggu / 2 minggu / 1 bulan / 1 tahun, kalender 14 hari), riwayat, menu Admin Referensi Minuman, serta kolom progres di List Responden.
+
+Sebelum pilot, peneliti wajib mengganti tiga hal yang masih berupa **CONTOH**: butir kuesioner, nilai gula di Referensi Minuman, dan teks lembar persetujuan.
+
+Fase berikutnya (edukasi, target, posttest, dashboard agregat, ekspor) belum dikerjakan; lihat PRD bagian 14.
 
 ## Menjalankan secara lokal
 

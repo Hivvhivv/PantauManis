@@ -45,6 +45,8 @@ export async function startEmbeddedPostgres(opts: Options): Promise<EmbeddedDb> 
     password: PASSWORD,
     port: opts.port,
     persistent: !opts.fresh,
+    // Wajib UTF-8: tanpa ini Postgres di Windows memakai WIN1252 dan menolak emoji/huruf non-Latin.
+    initdbFlags: ["--encoding=UTF8", "--locale=C"],
     onLog: () => {},
   });
 

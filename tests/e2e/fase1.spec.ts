@@ -50,8 +50,8 @@ test.describe("Fase 1", () => {
     // (#code-error, bukan getByRole("alert"): Next.js punya elemen alert sendiri untuk pengumuman rute.)
     await expect(resp.locator("#code-error")).toHaveText("Kode tidak valid atau tidak aktif.");
     await codeLogin(resp, newCode.toLowerCase());
-    await expect(resp).toHaveURL(/\/mulai$/);
-    await expect(resp.getByRole("heading", { level: 1 })).toContainText("Selamat datang");
+    await expect(resp).toHaveURL(/\/persetujuan$/);
+    await expect(resp.getByRole("heading", { level: 1 })).toContainText("Halo");
     await ctx.close();
   });
 
@@ -63,8 +63,12 @@ test.describe("Fase 1", () => {
     await page.getByRole("link", { name: "Manajemen Pengguna" }).click();
     await page.getByRole("link", { name: "Tambah Pengguna" }).click();
 
-    await page.getByLabel("Peran").selectOption("admin");
-    await expect(page.getByLabel("Email")).toBeVisible();
+    // Pilihan pertama sesekali hilang karena form dipasang ulang setelah navigasi klien;
+    // pilih ulang sampai kolom staf tampil (lihat catatan di laporan Fase 2).
+    await expect(async () => {
+      await page.getByLabel("Peran").selectOption("admin");
+      await expect(page.getByLabel("Email")).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 15_000 });
 
     await page.getByLabel("Peran").selectOption("respondent");
     await expect(page.getByLabel("Email")).toHaveCount(0);

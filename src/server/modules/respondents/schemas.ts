@@ -63,6 +63,8 @@ export const listQuerySchema = z.object({
   q: z.string().trim().max(50).optional().catch(undefined),
   status: z.enum(["all", "active", "inactive"]).catch("all"),
   sort: z.enum(["label", "created", "last_active"]).catch("label"),
+  /** Filter progres (FR-A-02): belum pretest, kelengkapan < 50%. */
+  progress: z.enum(["all", "no_pretest", "low_completeness"]).catch("all"),
   page: z.coerce.number().int().min(1).catch(1),
 });
 export type ListQuery = z.infer<typeof listQuerySchema>;

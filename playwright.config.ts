@@ -22,7 +22,8 @@ export default defineConfig({
   webServer: {
     command: "npx tsx scripts/e2e-server.ts",
     url: "http://localhost:3100/masuk",
-    timeout: 240_000,
+    // Termasuk `next build` produksi.
+    timeout: 600_000,
     reuseExistingServer: false,
   },
 });

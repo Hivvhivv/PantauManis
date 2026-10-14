@@ -8,6 +8,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Test e2e memakai folder build terpisah (lihat scripts/e2e-server.ts).
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   poweredByHeader: false,
   serverExternalPackages: ["@node-rs/argon2"],
   experimental: {

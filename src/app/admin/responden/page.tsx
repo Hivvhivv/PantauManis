@@ -4,7 +4,7 @@ import { Pagination } from "@/components/Pagination";
 import { staffForPage } from "@/server/auth/page-guards";
 import { listQuerySchema } from "@/server/modules/respondents/schemas";
 import { listRespondents } from "@/server/modules/respondents/service";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, studyDayLabel } from "@/lib/format";
 import { CodeReveal } from "./CodeReveal";
 import { RespondentActions } from "./RespondentActions";
 
@@ -54,6 +54,14 @@ export default async function RespondentListPage({ searchParams }: { searchParam
             <option value="all">Semua</option>
             <option value="active">Aktif</option>
             <option value="inactive">Nonaktif</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="progress">Progres</label>
+          <select id="progress" name="progress" defaultValue={query.progress}>
+            <option value="all">Semua</option>
+            <option value="no_pretest">Belum pretest</option>
+            <option value="low_completeness">Kelengkapan &lt; 50%</option>
           </select>
         </div>
         <div>
@@ -109,9 +117,13 @@ export default async function RespondentListPage({ searchParams }: { searchParam
                     {r.accessStatus === "active" ? "Aktif" : "Nonaktif"}
                   </span>
                 </td>
-                <td>—</td>
-                <td>—</td>
-                <td>Belum / Belum</td>
+                <td>{studyDayLabel(r.progress)}</td>
+                <td>
+                  {r.progress.completeness
+                    ? `${r.progress.completeness.filled}/${r.progress.completeness.elapsed}`
+                    : "—"}
+                </td>
+                <td>{r.progress.pretestDone ? "Selesai" : "Belum"} / Belum</td>
                 <td className="small">{formatDateTime(r.lastActiveAt)}</td>
                 <td>
                   <RespondentActions
@@ -130,7 +142,7 @@ export default async function RespondentListPage({ searchParams }: { searchParam
         page={data.page}
         pageCount={data.pageCount}
         basePath="/admin/responden"
-        params={{ q: query.q, status: query.status, sort: query.sort }}
+        params={{ q: query.q, status: query.status, sort: query.sort, progress: query.progress }}
       />
     </>
   );

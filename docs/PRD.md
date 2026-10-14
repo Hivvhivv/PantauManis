@@ -150,7 +150,9 @@ FR-R-01 Persetujuan dan pretest
 • Setelah dikirim, pretest terkunci dan tidak bisa diubah Responden. Hari ke-1 periode dimulai pada tanggal pretest selesai.
 FR-R-02 Pencatatan konsumsi minuman
 • Form berisi: jenis minuman (dropdown: teh manis, kopi susu, boba/milk tea, minuman bersoda, jus kemasan, minuman energi, susu berperisa, lainnya), ukuran (pilihan gelas/botol atau ml), jumlah sajian, tingkat gula (normal/less/no sugar bila relevan), waktu minum, dan catatan opsional.
-• Estimasi gula (gram) dihitung otomatis dari tabel referensi yang dikelola Admin dan ditampilkan sebagai perkiraan.
+• Estimasi gula (gram) dihitung otomatis dari tabel referensi yang dikelola Admin dan ditampilkan sebagai perkiraan. Rumus: gula per sajian × (volume ÷ volume standar) × porsi × faktor tingkat gula (normal 1, less 0,5, no sugar 0; dapat diubah di study_settings). Lihat ADR-005.
+• Preset ukuran: gelas kecil 200 ml, gelas sedang 300 ml, gelas besar 500 ml, botol/kaleng 330 ml, botol besar 600 ml, atau isi ml sendiri.
+• Menghapus minuman terakhir di suatu hari mengembalikan hari itu ke Belum diisi (bukan Nol). Status Nol ditolak bila hari itu sudah ada catatan minuman.
 • Tombol "Hari ini saya tidak minum minuman manis" menyimpan catatan konsumsi nol secara eksplisit. Hari tanpa catatan apa pun tampil sebagai Belum diisi, berbeda dari Nol.
 • Responden dapat mengedit/menghapus catatan pada hari yang sama dan mengisi susulan maksimal 2 hari ke belakang. Setiap perubahan tercatat (waktu dibuat, waktu diubah, susulan atau tidak).
 FR-R-03 Dashboard Responden
@@ -347,7 +349,7 @@ Hari tanpa catatan = Belum diisi; hari dengan tombol "tidak minum" = Nol. Keduan
 BR-03
 Jika Responden menambah minuman pada hari berstatus Nol, status otomatis berubah menjadi Terisi.
 BR-04
-Volume 1–3.000 ml per catatan, jumlah sajian 1–10, waktu minum tidak boleh di masa depan atau di luar periode penelitian.
+Volume 1–3.000 ml per catatan, jumlah sajian 1–10, waktu minum tidak boleh di masa depan atau sebelum hari ke-1. Catatan setelah hari terakhir periode tetap diterima dan ditandai is_out_of_period (keputusan 2026-10-14, ADR-005).
 BR-05
 Pengisian susulan maksimal 2 hari ke belakang (dapat diatur Superadmin); ditandai is_backfill.
 BR-06
@@ -482,8 +484,9 @@ Pertanyaan terbuka
 [x] Apakah kode akses perlu tetap terlihat di List Responden? Ya, disimpan terenkripsi (ADR-004).
 [x] Apakah setiap Admin melihat semua responden? Ya, semua responden.
 [x] Apakah kode akses kedaluwarsa setelah periode penelitian? Tidak; Responden tetap dapat mengakses.
-[ ] Instrumen pretest dan posttest apa yang dipakai (jumlah butir, skala, cara skor)?
-[ ] Sumber nilai gula per jenis minuman untuk tabel referensi.
-[ ] Apakah pencatatan dikunci setelah posttest, atau responden tetap bisa mencatat?
+[ ] Instrumen pretest dan posttest apa yang dipakai (jumlah butir, skala, cara skor)? — Mesin kuesioner sudah ada (Fase 2) dengan butir CONTOH; butir final dimasukkan lewat migration setelah instrumen disetujui.
+[ ] Sumber nilai gula per jenis minuman untuk tabel referensi. — Menu Admin "Referensi Minuman" sudah ada (Fase 2); 8 jenis awal masih nilai CONTOH bertanda "perlu diverifikasi".
+[x] Apakah pencatatan dikunci setelah posttest? Tidak: responden tetap bisa mencatat setelah hari ke-14; catatan ditandai di luar periode.
+[ ] Teks resmi lembar informasi/persetujuan yang disetujui komite etik (saat ini teks CONTOH di study_settings.consent_text).
 [ ] Apakah dibutuhkan pengingat harian (email/WhatsApp) di fase berikutnya?
 [ ] Ketentuan komite etik tentang lokasi server, masa simpan data, dan penghapusan data setelah penelitian.

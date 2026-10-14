@@ -40,6 +40,19 @@ export function toDateInput(d: Date | string | null | undefined): string {
   return d ? new Date(d).toISOString().slice(0, 10) : "";
 }
 
+/** "6/14", atau "Selesai (hari 20)" setelah periode berakhir. */
+export function studyDayLabel(p: { studyDay: number | null; durationDays: number }): string {
+  if (p.studyDay === null) return "—";
+  return p.studyDay > p.durationDays
+    ? `Selesai (hari ${p.studyDay})`
+    : `${p.studyDay}/${p.durationDays}`;
+}
+
+/** Tanggal "YYYY-MM-DD" (tanpa jam) → "14 Okt 2026". */
+export function formatLocalDate(d: string): string {
+  return formatPlainDate(`${d}T00:00:00Z`);
+}
+
 export const ROLE_LABELS = {
   superadmin: "Superadmin",
   admin: "Admin",

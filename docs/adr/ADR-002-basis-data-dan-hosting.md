@@ -21,8 +21,9 @@ Mesin pengembangan saat ini tidak memiliki Docker maupun PostgreSQL terpasang.
    - Nama tabel dan kolom memakai `snake_case` (dipetakan dari model Prisma dengan `@@map`/`@map`).
    - Primary key berupa UUID agar ID internal tidak bisa ditebak secara berurutan.
    - Soft delete memakai kolom `deleted_at`.
-4. **Pengembangan dan test lokal:** paket `embedded-postgres` (biner PostgreSQL asli yang diunduh lewat npm) dijalankan lewat skrip `npm run db:dev`. Integration test membuat basis data terpisah dan menerapkan migration sebelum test berjalan. Jika nanti Docker atau PostgreSQL lokal tersedia, cukup ganti `DATABASE_URL`.
-5. **Hosting (diusulkan):**
+4. **Encoding wajib UTF-8** (`ENCODING 'UTF8'`). Di Windows, `initdb` bawaan memakai WIN1252 dan menolak emoji serta huruf non-Latin. Helper `embedded-postgres` membuat cluster dengan `--encoding=UTF8 --locale=C`. Database produksi juga harus dibuat dengan UTF-8.
+5. **Pengembangan dan test lokal:** paket `embedded-postgres` (biner PostgreSQL asli yang diunduh lewat npm) dijalankan lewat skrip `npm run db:dev`. Integration test membuat basis data terpisah dan menerapkan migration sebelum test berjalan. Jika nanti Docker atau PostgreSQL lokal tersedia, cukup ganti `DATABASE_URL`.
+6. **Hosting (diusulkan):**
    - Aplikasi: Vercel (region `sin1` Singapura) atau VPS.
    - Basis data: PostgreSQL terkelola dengan backup harian yang disimpan minimal 30 hari (PRD bagian 11).
    - **Lokasi data belum diputuskan.** Pilihannya: (a) region Singapura (mis. Neon/Supabase/AWS `ap-southeast-1`), atau (b) region Jakarta (AWS `ap-southeast-3`, GCP `asia-southeast2`, atau penyedia lokal) jika komite etik atau regulasi pelindungan data pribadi mensyaratkan data disimpan di Indonesia. ADR ini diperbarui setelah ketentuan komite etik diterima.

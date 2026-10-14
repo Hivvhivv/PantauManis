@@ -80,8 +80,14 @@ model Respondent {
   updatedAt           DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   deletedAt           DateTime?    @map("deleted_at") @db.Timestamptz(3)
 
-  createdBy StaffUser?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  sessions  RespondentSession[]
+  /// Hari ke-1 penelitian = tanggal pretest dikirim (Asia/Jakarta). Null = belum pretest (BR-01).
+  dayOneDate          DateTime?    @map("day_one_date") @db.Date
+
+  createdBy       StaffUser?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  sessions        RespondentSession[]
+  consumptionLogs ConsumptionLog[]
+  dailyStatuses   DailyStatus[]
+  responses       QuestionnaireResponse[]
 
   @@index([deletedAt, accessStatus])
   @@map("respondents")
@@ -174,4 +180,178 @@ model StudySetting {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("study_settings")
+}
+
+/// Referensi minuman untuk estimasi gula (FR-A-06). Dikelola Admin.
+model BeverageType {
+  id                   String   @id @default(uuid()) @db.Uuid
+  name                 String   @unique @db.VarChar(60)
+  /// Ikon (emoji) untuk ubin pilihan di form pencatatan.
+  icon                 String   @default("🥤") @db.VarChar(16)
+  defaultVolumeMl      Int      @map("default_volume_ml")
+  /// Perkiraan gula (gram) per sajian standar (default_volume_ml).
+  sugarGPerServing     Float    @map("sugar_g_per_serving")
+  /// Apakah pilihan tingkat gula (normal/less/no sugar) relevan untuk jenis ini.
+  sugarLevelApplicable Boolean  @default(true) @map("sugar_level_applicable")
+  source               String?  @db.VarChar(300)
+  /// true = nilai masih contoh dan perlu diverifikasi peneliti sebelum dipakai.
+  needsVerification    Boolean  @default(true) @map("needs_verification")
+  isActive             Boolean  @default(true) @map("is_active")
+  sortOrder            Int      @default(0) @map("sort_order")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  logs ConsumptionLog[]
+
+  @@map("beverage_types")
+}
+
+enum SugarLevel {
+  normal
+  less
+  none
+
+  @@map("sugar_level")
+}
+
+/// Satu baris per minuman (FR-R-02). Hapus = soft delete agar jejak perubahan tetap ada.
+model ConsumptionLog {
+  id             String      @id @default(uuid()) @db.Uuid
+  respondentId   String      @map("respondent_id") @db.Uuid
+  beverageTypeId String      @map("beverage_type_id") @db.Uuid
+  volumeMl       Int         @map("volume_ml")
+  servings       Int
+  sugarLevel     SugarLevel? @map("sugar_level")
+  /// Perkiraan gula (gram) dihitung saat dibuat/diubah; tidak berubah bila referensi diedit.
+  sugarGSnapshot Float       @map("sugar_g_snapshot")
+  consumedAt     DateTime    @map("consumed_at") @db.Timestamptz(3)
+  /// Tanggal minum menurut Asia/Jakarta.
+  localDate      DateTime    @map("local_date") @db.Date
+  studyDay       Int         @map("study_day")
+  isBackfill     Boolean     @default(false) @map("is_backfill")
+  /// Dicatat setelah hari terakhir periode penelitian (ADR-005).
+  isOutOfPeriod  Boolean     @default(false) @map("is_out_of_period")
+  note           String?     @db.VarChar(500)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt      DateTime?   @map("deleted_at") @db.Timestamptz(3)
+
+  respondent   Respondent   @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+  beverageType BeverageType @relation(fields: [beverageTypeId], references: [id])
+
+  @@index([respondentId, localDate])
+  @@map("consumption_logs")
+}
+
+enum DayStatusValue {
+  filled
+  zero
+
+  @@map("day_status")
+}
+
+/// Status per hari. Tidak ada baris = "Belum diisi"; zero = "Nol" (BR-02, ADR-005).
+model DailyStatus {
+  id           String         @id @default(uuid()) @db.Uuid
+  respondentId String         @map("respondent_id") @db.Uuid
+  date         DateTime       @db.Date
+  studyDay     Int            @map("study_day")
+  status       DayStatusValue
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  respondent Respondent @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+
+  @@unique([respondentId, date])
+  @@map("daily_status")
+}
+
+enum QuestionnaireType {
+  pretest
+  posttest
+
+  @@map("questionnaire_type")
+}
+
+enum QuestionType {
+  likert
+  choice
+  text
+
+  @@map("question_type")
+}
+
+enum ResponseStatus {
+  draft
+  submitted
+
+  @@map("response_status")
+}
+
+/// Instrumen kuesioner. Hanya satu versi aktif per jenis.
+model Questionnaire {
+  id            String            @id @default(uuid()) @db.Uuid
+  type          QuestionnaireType
+  version       Int
+  title         String            @db.VarChar(200)
+  intro         String?
+  /// true = butir masih contoh; ganti dengan instrumen final sebelum pilot.
+  isPlaceholder Boolean           @default(false) @map("is_placeholder")
+  isActive      Boolean           @default(true) @map("is_active")
+  createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  questions Question[]
+  responses QuestionnaireResponse[]
+
+  @@unique([type, version])
+  @@map("questionnaires")
+}
+
+model Question {
+  id              String       @id @default(uuid()) @db.Uuid
+  questionnaireId String       @map("questionnaire_id") @db.Uuid
+  order           Int
+  text            String
+  type            QuestionType
+  /// Pilihan jawaban: [{ value, label, score }]. Kosong untuk isian.
+  options         Json?
+  required        Boolean      @default(true)
+
+  questionnaire Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+  answers       Answer[]
+
+  @@unique([questionnaireId, order])
+  @@map("questions")
+}
+
+/// Satu per responden per kuesioner. Setelah submitted, terkunci (BR-07).
+model QuestionnaireResponse {
+  id              String         @id @default(uuid()) @db.Uuid
+  respondentId    String         @map("respondent_id") @db.Uuid
+  questionnaireId String         @map("questionnaire_id") @db.Uuid
+  status          ResponseStatus @default(draft)
+  score           Float?
+  startedAt       DateTime       @default(now()) @map("started_at") @db.Timestamptz(3)
+  updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+  submittedAt     DateTime?      @map("submitted_at") @db.Timestamptz(3)
+
+  respondent    Respondent    @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+  questionnaire Questionnaire @relation(fields: [questionnaireId], references: [id])
+  answers       Answer[]
+
+  @@unique([respondentId, questionnaireId])
+  @@map("questionnaire_responses")
+}
+
+model Answer {
+  id         String @id @default(uuid()) @db.Uuid
+  responseId String @map("response_id") @db.Uuid
+  questionId String @map("question_id") @db.Uuid
+  value      String @db.VarChar(2000)
+
+  response QuestionnaireResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question Question              @relation(fields: [questionId], references: [id])
+
+  @@unique([responseId, questionId])
+  @@map("answers")
 }

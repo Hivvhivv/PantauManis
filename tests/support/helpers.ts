@@ -4,6 +4,7 @@ import { createRespondentSession, createStaffSession } from "@/server/auth/sessi
 import { prisma } from "@/server/db";
 import { RESPONDENT_COOKIE, STAFF_COOKIE } from "@/server/http/cookies";
 import { createRespondent } from "@/server/modules/respondents/service";
+import { addDays, localDateOf, toDbDate } from "@/server/modules/study/days";
 
 type Handler = (req: NextRequest, ctx: { params: Promise<never> }) => Promise<Response>;
 
@@ -75,6 +76,30 @@ export async function makeRespondent(actorId: string | null = null, label?: stri
     { type: actorId ? "staff" : "system", id: actorId, ip: "10.0.0.1" },
   );
 }
+
+/**
+ * Responden yang sudah setuju dan sudah pretest. Hari ke-1 = `dayOneOffset` hari dari hari ini
+ * (mis. -5 = pretest lima hari lalu). Mengembalikan cookie sesi dan tanggal penting.
+ */
+export async function readyRespondent(dayOneOffset = -5, label?: string) {
+  const r = await makeRespondent(null, label);
+  const today = localDateOf(new Date());
+  const dayOne = addDays(today, dayOneOffset);
+  await prisma.respondent.update({
+    where: { id: r.id },
+    data: { consentAt: new Date(), dayOneDate: toDbDate(dayOne) },
+  });
+  return { ...r, cookie: await respondentCookie(r.id), today, dayOne };
+}
+
+/** Jenis minuman aktif dari data awal migration. */
+export async function seededBeverage(name: string) {
+  return prisma.beverageType.findFirstOrThrow({ where: { name } });
+}
+
+/** "YYYY-MM-DD" + "HH:mm" → nilai waktu lokal untuk API pencatatan. */
+// Default 00:00 agar catatan "hari ini" tidak pernah jatuh di masa depan saat test dijalankan.
+export const at = (date: string, time = "00:00") => `${date}T${time}`;
 
 export async function respondentCookie(respondentId: string) {
   return `${RESPONDENT_COOKIE}=${await createRespondentSession(respondentId, "vitest")}`;

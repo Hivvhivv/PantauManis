@@ -2,7 +2,7 @@
  * Server untuk test e2e: Postgres baru (port 54331), migration, akun staf uji, lalu `next dev` di port 3100.
  * Dijalankan otomatis oleh Playwright (lihat playwright.config.ts).
  */
-import { spawn } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { hash } from "@node-rs/argon2";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -42,16 +42,21 @@ async function main() {
   });
   await prisma.$disconnect();
 
-  const next = spawn("npx", ["next", "dev", "-p", "3100"], {
+  const env = {
+    ...process.env,
+    DATABASE_URL: url,
+    APP_URL: "http://localhost:3100",
+    ACCESS_CODE_HMAC_SECRET: randomBytes(32).toString("base64"),
+    ACCESS_CODE_ENC_KEY: randomBytes(32).toString("base64"),
+    // Build produksi: tanpa kompilasi per halaman seperti `next dev`, jadi waktu test stabil.
+    // Folder build terpisah (.next-e2e) agar tidak bentrok dengan `npm run dev`.
+    NEXT_DIST_DIR: ".next-e2e",
+  };
+  execSync("npx next build", { stdio: "inherit", env });
+  const next = spawn("npx", ["next", "start", "-p", "3100"], {
     stdio: "inherit",
     shell: true,
-    env: {
-      ...process.env,
-      DATABASE_URL: url,
-      APP_URL: "http://localhost:3100",
-      ACCESS_CODE_HMAC_SECRET: randomBytes(32).toString("base64"),
-      ACCESS_CODE_ENC_KEY: randomBytes(32).toString("base64"),
-    },
+    env,
   });
 
   const stop = async () => {

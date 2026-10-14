@@ -38,3 +38,15 @@ export async function requireRespondent(req: Request): Promise<Respondent> {
   if (!r) throw unauthenticated();
   return r;
 }
+
+export type ReadyRespondent = Respondent & { consentAt: Date; dayOneDate: Date };
+
+/** Responden yang sudah setuju dan sudah pretest: syarat fitur pencatatan (BR-06). */
+export async function requireReadyRespondent(req: Request): Promise<ReadyRespondent> {
+  const r = await requireRespondent(req);
+  if (!r.consentAt)
+    throw new AppError(403, "CONSENT_REQUIRED", "Berikan persetujuan terlebih dahulu.");
+  if (!r.dayOneDate)
+    throw new AppError(403, "PRETEST_REQUIRED", "Selesaikan kuesioner awal terlebih dahulu.");
+  return r as ReadyRespondent;
+}

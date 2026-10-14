@@ -27,6 +27,8 @@ export const AuditAction = {
   RespondentCardsPrinted: "respondents.cards_printed",
   CodeLoginPaused: "security.code_login_paused",
   SecurityAlertAcknowledged: "security.alert_acknowledged",
+  BeverageTypeCreated: "beverage_type.created",
+  BeverageTypeUpdated: "beverage_type.updated",
 } as const;
 
 export type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];
@@ -36,7 +38,7 @@ export type Actor = { type: ActorType; id: string | null; ip: string | null };
 export type AuditEntry = {
   actor: Actor;
   action: AuditActionName;
-  targetType?: "staff_user" | "respondent" | "security_alert";
+  targetType?: "staff_user" | "respondent" | "security_alert" | "beverage_type";
   targetId?: string | null;
   /** Jangan pernah memasukkan kode akses, kata sandi, token, atau jawaban kuesioner. */
   metadata?: Record<string, string | number | boolean | null | string[]>;

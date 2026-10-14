@@ -12,6 +12,9 @@ import { decrypt, encrypt } from "@/server/crypto/encryption";
 import { revokeRespondentSessions } from "@/server/auth/sessions";
 import { conflict, notFound, validationError } from "@/server/http/errors";
 import { AuditAction, writeAudit, type Actor } from "@/server/modules/audit";
+import { fromDbDate, localDateOf, studyDayOf } from "@/server/modules/study/days";
+import { completeness } from "@/server/modules/study/series";
+import { getStudySettings } from "@/server/modules/study/settings";
 import type { Prisma } from "@/generated/prisma/client";
 import { parseImportCsv, toCsv } from "./csv";
 import { labelRange, nextLabelNumber } from "./labels";
@@ -260,6 +263,14 @@ export async function softDeleteRespondent(id: string, actor: Actor) {
   await revokeRespondentSessions(id);
 }
 
+export type Progress = {
+  pretestDone: boolean;
+  /** Hari ke- hari ini (null = belum pretest). Bisa > durasi setelah periode berakhir. */
+  studyDay: number | null;
+  durationDays: number;
+  completeness: { filled: number; elapsed: number } | null;
+};
+
 export type RespondentListItem = {
   id: string;
   label: string;
@@ -268,12 +279,69 @@ export type RespondentListItem = {
   accessStatus: "active" | "inactive";
   lastActiveAt: Date | null;
   createdAt: Date;
+  progress: Progress;
 };
+
+/** Hari ke-, kelengkapan, dan status pretest untuk sekumpulan responden. */
+async function progressFor(rows: { id: string; dayOneDate: Date | null }[], now = new Date()) {
+  const settings = await getStudySettings();
+  const today = localDateOf(now);
+  const withDayOne = rows.filter((r) => r.dayOneDate);
+  const statuses = withDayOne.length
+    ? await prisma.dailyStatus.findMany({
+        where: { respondentId: { in: withDayOne.map((r) => r.id) } },
+        select: { respondentId: true, date: true },
+      })
+    : [];
+  const byResp = new Map<string, string[]>();
+  for (const s of statuses) {
+    const list = byResp.get(s.respondentId) ?? [];
+    list.push(fromDbDate(s.date));
+    byResp.set(s.respondentId, list);
+  }
+  return new Map<string, Progress>(
+    rows.map((r) => {
+      if (!r.dayOneDate) {
+        return [
+          r.id,
+          {
+            pretestDone: false,
+            studyDay: null,
+            durationDays: settings.durationDays,
+            completeness: null,
+          },
+        ];
+      }
+      const dayOne = fromDbDate(r.dayOneDate);
+      return [
+        r.id,
+        {
+          pretestDone: true,
+          studyDay: studyDayOf(dayOne, today),
+          durationDays: settings.durationDays,
+          completeness: completeness({
+            dayOne,
+            today,
+            durationDays: settings.durationDays,
+            statusDates: byResp.get(r.id) ?? [],
+          }),
+        },
+      ];
+    }),
+  );
+}
+
+const isLowCompleteness = (p: Progress) =>
+  !!p.completeness &&
+  p.completeness.elapsed > 0 &&
+  p.completeness.filled / p.completeness.elapsed < 0.5;
 
 export async function listRespondents(query: ListQuery) {
   const where: Prisma.RespondentWhereInput = {
     deletedAt: null,
     ...(query.status !== "all" ? { accessStatus: query.status } : {}),
+    ...(query.progress === "no_pretest" ? { dayOneDate: null } : {}),
+    ...(query.progress === "low_completeness" ? { dayOneDate: { not: null } } : {}),
     ...(query.q
       ? {
           OR: [
@@ -290,15 +358,30 @@ export async function listRespondents(query: ListQuery) {
         ? [{ lastActiveAt: { sort: "desc", nulls: "last" } }]
         : [{ label: "asc" }];
 
-  const [total, rows] = await Promise.all([
-    prisma.respondent.count({ where }),
-    prisma.respondent.findMany({
-      where,
-      orderBy,
-      skip: (query.page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-    }),
-  ]);
+  let total: number;
+  let rows: Awaited<ReturnType<typeof prisma.respondent.findMany>>;
+  let progress: Map<string, Progress>;
+
+  if (query.progress === "low_completeness") {
+    // Kelengkapan dihitung, bukan kolom: saring di memori lalu paginasi (skala satu studi).
+    const all = await prisma.respondent.findMany({ where, orderBy });
+    const allProgress = await progressFor(all);
+    const matching = all.filter((r) => isLowCompleteness(allProgress.get(r.id)!));
+    total = matching.length;
+    rows = matching.slice((query.page - 1) * PAGE_SIZE, query.page * PAGE_SIZE);
+    progress = allProgress;
+  } else {
+    [total, rows] = await Promise.all([
+      prisma.respondent.count({ where }),
+      prisma.respondent.findMany({
+        where,
+        orderBy,
+        skip: (query.page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+      }),
+    ]);
+    progress = await progressFor(rows);
+  }
 
   const items: RespondentListItem[] = rows.map((r) => ({
     id: r.id,
@@ -308,6 +391,7 @@ export async function listRespondents(query: ListQuery) {
     accessStatus: r.accessStatus,
     lastActiveAt: r.lastActiveAt,
     createdAt: r.createdAt,
+    progress: progress.get(r.id)!,
   }));
   return {
     items,
@@ -336,6 +420,9 @@ export async function getRespondentDetail(id: string) {
     createdByName: r.createdBy?.name ?? null,
     createdAt: r.createdAt,
     lastActiveAt: r.lastActiveAt,
+    dayOneDate: r.dayOneDate,
+    consentAt: r.consentAt,
+    progress: (await progressFor([r])).get(r.id)!,
   };
 }
 

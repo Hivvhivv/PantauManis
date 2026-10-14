@@ -13,11 +13,11 @@ const loginAs = (code: string, ip = "10.0.0.1") =>
   call(login, { body: { code }, headers: { "x-forwarded-for": ip } });
 
 describe("login Responden dengan kode akses", () => {
-  it("AC-01: kode aktif yang valid → masuk, cookie HttpOnly, diarahkan ke /mulai", async () => {
+  it("AC-01: kode aktif yang valid → masuk, cookie HttpOnly, diarahkan ke /persetujuan (login pertama)", async () => {
     const r = await makeRespondent();
     const res = await loginAs(r.code);
     expect(res.status).toBe(200);
-    expect(res.json.redirectTo).toBe("/mulai");
+    expect(res.json.redirectTo).toBe("/persetujuan");
     const setCookie = res.headers.get("set-cookie")!;
     expect(setCookie).toMatch(/pm_resp=/);
     expect(setCookie).toMatch(/HttpOnly/i);

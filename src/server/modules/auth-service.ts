@@ -31,9 +31,11 @@ export function normalizeEmail(email: string): string {
 }
 
 /** Tujuan setelah login Responden (PRD 4.3). Pretest dibuat di Fase 2, jadi semua ke /mulai. */
-export function respondentHomePath(r: Pick<Respondent, "consentAt">): string {
-  void r;
-  return "/mulai";
+/** Tujuan Responden setelah login (PRD 4.3): persetujuan → pretest → beranda. */
+export function respondentHomePath(r: Pick<Respondent, "consentAt" | "dayOneDate">): string {
+  if (!r.consentAt) return "/persetujuan";
+  if (!r.dayOneDate) return "/pretest";
+  return "/beranda";
 }
 
 export function staffHomePath(u: Pick<StaffUser, "mustChangePassword">): string {

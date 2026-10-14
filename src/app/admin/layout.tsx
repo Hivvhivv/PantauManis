@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <nav aria-label="Menu utama">
             <Link href="/admin">Dashboard</Link>
             <Link href="/admin/responden">List Responden</Link>
+            <Link href="/admin/referensi-minuman">Referensi Minuman</Link>
             {isSuper && <Link href="/admin/pengguna">Manajemen Pengguna</Link>}
           </nav>
           <span className="spacer" />
