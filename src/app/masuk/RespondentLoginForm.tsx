@@ -41,9 +41,12 @@ export function RespondentLoginForm() {
           value={code}
           onChange={(e) => setCode(e.target.value)}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? "code-error" : undefined}
+          aria-describedby={error ? "code-error code-help" : "code-help"}
           required
         />
+        <p id="code-help" className="hint" style={{ margin: "0.35rem 0 0" }}>
+          Boleh diketik tanpa &quot;PM-&quot;, spasi, atau tanda strip.
+        </p>
       </div>
       {error && (
         <p id="code-error" className="alert alert-error" role="alert">

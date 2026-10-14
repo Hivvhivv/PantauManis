@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoutButton } from "@/components/LogoutButton";
+import { Logo } from "@/components/Logo";
 import { staffForPage } from "@/server/auth/page-guards";
 import { openAlerts } from "@/server/modules/security-alerts";
 import { ROLE_LABELS } from "@/lib/format";
@@ -14,7 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <>
       <header className="topbar">
         <div className="container">
-          <span className="brand">PantauManis</span>
+          <Logo />
           <nav aria-label="Menu utama">
             <Link href="/admin">Dashboard</Link>
             <Link href="/admin/responden">List Responden</Link>

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Disclaimer } from "@/components/Disclaimer";
+import { DrinksIllustration } from "@/components/DrinksIllustration";
+import { Logo } from "@/components/Logo";
 import { resolveRespondentSession } from "@/server/auth/sessions";
 import { RESPONDENT_COOKIE } from "@/server/http/cookies";
 import { respondentHomePath } from "@/server/modules/auth-service";
@@ -15,19 +17,34 @@ export default async function MasukPage() {
   if (r) redirect(respondentHomePath(r));
 
   return (
-    <main className="narrow stack">
-      <div>
-        <p className="brand">PantauManis</p>
-        <h1>Masuk dengan Kode Akses</h1>
-        <p className="muted">Masukkan kode akses yang Anda terima dari tim peneliti.</p>
+    <main className="auth-page">
+      <div className="auth-split">
+        <section className="auth-brand">
+          <Logo size={40} />
+          <p className="tagline">Langkah kecil, kebiasaan baru</p>
+          <p className="lead">
+            Catat minuman manismu setiap hari dan lihat perkembanganmu sendiri, pelan-pelan saja.
+          </p>
+          <DrinksIllustration />
+        </section>
+
+        <div className="stack">
+          <section className="auth-card stack">
+            <div>
+              <h1>Selamat datang!</h1>
+              <p className="muted" style={{ margin: "0.35rem 0 0" }}>
+                Masukkan kode akses yang kamu terima dari tim peneliti.
+              </p>
+            </div>
+            <RespondentLoginForm />
+            <div className="divider">atau</div>
+            <p className="switch-link" style={{ margin: 0 }}>
+              Tim peneliti? <Link href="/staf/masuk">Masuk sebagai staf</Link>
+            </p>
+          </section>
+          <Disclaimer />
+        </div>
       </div>
-      <div className="card">
-        <RespondentLoginForm />
-      </div>
-      <Disclaimer />
-      <p className="small muted">
-        Tim peneliti? <Link href="/staf/masuk">Masuk sebagai staf</Link>
-      </p>
     </main>
   );
 }

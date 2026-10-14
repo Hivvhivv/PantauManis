@@ -94,6 +94,15 @@ test.describe("Fase 1", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
+  test("login responden ↔ login staf bisa saling berpindah", async ({ page }) => {
+    await page.goto("/masuk");
+    await page.getByRole("link", { name: "Masuk sebagai staf" }).click();
+    await expect(page).toHaveURL(/\/staf\/masuk$/);
+    await page.getByRole("link", { name: "Kembali ke halaman masuk responden" }).click();
+    await expect(page).toHaveURL(/\/masuk$/);
+    await expect(page.getByLabel(/Kode Akses/)).toBeVisible();
+  });
+
   test("tanpa sesi, /admin dialihkan ke halaman masuk staf", async ({ page }) => {
     await page.goto("/admin/responden");
     await expect(page).toHaveURL(/\/staf\/masuk$/);

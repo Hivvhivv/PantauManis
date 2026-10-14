@@ -1,38 +1,56 @@
+/* Palet hangat: krem, karamel, aksen sage. Kontras teks memenuhi WCAG AA. */
 :root {
-  --bg: #f7f7f5;
-  --surface: #ffffff;
-  --text: #1c1f23;
-  --muted: #4f5761;
-  --border: #d5d8dc;
-  --primary: #0b6e4f;
-  --primary-hover: #095a41;
+  --bg: #fbf6ee;
+  --bg-soft: #f4e8d7;
+  --surface: #fffdf9;
+  --text: #3a2c22;
+  --muted: #6e5c4e;
+  --border: #e7d9c6;
+  --primary: #9c5b2e;
+  --primary-hover: #7e4722;
   --primary-text: #ffffff;
-  --danger: #b42318;
-  --danger-bg: #fdecea;
-  --warning-bg: #fff4d6;
+  --primary-soft: #f3e3d0;
+  --accent: #8a9a5b;
+  --drink: #c98a55;
+  --water: #cfe3e6;
+  --danger: #a8321f;
+  --danger-bg: #fbe7e1;
+  --warning-bg: #fdf1d6;
   --warning-text: #6b4a00;
-  --info-bg: #e8f3ef;
-  --focus: #1d4ed8;
-  --radius: 8px;
+  --info-bg: #f3e8da;
+  --success-bg: #ecf0dc;
+  --success-text: #4b5a22;
+  --focus: #2f5dbf;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 24px rgba(94, 60, 30, 0.08);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #15181b;
-    --surface: #1f2327;
-    --text: #eceff1;
-    --muted: #b3bac1;
-    --border: #3a4147;
-    --primary: #4cc79a;
-    --primary-hover: #6dd6ae;
-    --primary-text: #0b1a14;
-    --danger: #ff8a80;
-    --danger-bg: #3b1d1a;
-    --warning-bg: #3a300f;
-    --warning-text: #ffe08a;
-    --info-bg: #17302a;
-    --focus: #93b4ff;
+    --bg: #1e1915;
+    --bg-soft: #2a221b;
+    --surface: #2a231d;
+    --text: #f3eae0;
+    --muted: #c9b8a6;
+    --border: #46392e;
+    --primary: #e0a87a;
+    --primary-hover: #ebbd95;
+    --primary-text: #2a1a0e;
+    --primary-soft: #3a2c20;
+    --accent: #a3b273;
+    --drink: #b9814f;
+    --water: #3d5458;
+    --danger: #ff9c8a;
+    --danger-bg: #3d211b;
+    --warning-bg: #3b3016;
+    --warning-text: #ffe2a0;
+    --info-bg: #33281f;
+    --success-bg: #2f3520;
+    --success-text: #d2dfa6;
+    --focus: #9db8ff;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     color-scheme: dark;
   }
 }
@@ -50,12 +68,13 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family:
+    var(--font-nunito),
     system-ui,
     -apple-system,
     "Segoe UI",
     Roboto,
     sans-serif;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 a {
@@ -95,6 +114,7 @@ h2 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
+  box-shadow: var(--shadow);
 }
 
 .stack > * + * {
@@ -135,9 +155,14 @@ textarea {
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   padding: 0.6rem 0.75rem;
   min-height: 44px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
 }
 input[aria-invalid="true"],
 select[aria-invalid="true"] {
@@ -167,8 +192,8 @@ textarea {
   min-height: 44px;
   padding: 0.5rem 1rem;
   font: inherit;
-  font-weight: 600;
-  border-radius: var(--radius);
+  font-weight: 700;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
@@ -225,8 +250,9 @@ textarea {
 .disclaimer {
   font-size: 0.875rem;
   color: var(--muted);
-  border-left: 3px solid var(--border);
-  padding-left: 0.75rem;
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
 }
 
 .badge {
@@ -270,9 +296,16 @@ textarea {
   text-decoration: none;
   font-weight: 600;
 }
-.brand {
-  font-weight: 700;
-  font-size: 1.1rem;
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.logo-text {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--primary);
+  letter-spacing: -0.01em;
 }
 .spacer {
   flex: 1;
@@ -347,6 +380,184 @@ dl.meta dd {
   align-items: center;
   justify-content: flex-end;
   margin-top: 0.75rem;
+}
+
+/* ---------- Halaman masuk (responden & staf) ---------- */
+.auth-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem 1rem 2rem;
+  background:
+    radial-gradient(circle at 10% 10%, var(--primary-soft), transparent 45%),
+    radial-gradient(circle at 90% 90%, var(--bg-soft), transparent 50%), var(--bg);
+}
+.auth-split {
+  width: 100%;
+  max-width: 980px;
+  display: grid;
+  gap: 1.25rem;
+}
+.auth-brand {
+  text-align: center;
+}
+.auth-brand .tagline {
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0.35rem 0 0;
+}
+.auth-brand .lead {
+  margin: 0.75rem auto 0;
+  max-width: 34ch;
+}
+.illustration {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  margin: 0.75rem auto 0;
+}
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.25rem;
+}
+.auth-card h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+.switch-link {
+  text-align: center;
+  font-size: 0.95rem;
+}
+.switch-link a {
+  font-weight: 700;
+}
+@media (min-width: 860px) {
+  .auth-split {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: 3rem;
+  }
+  .auth-brand {
+    text-align: left;
+  }
+  .auth-brand .lead {
+    margin-left: 0;
+  }
+  .illustration {
+    max-width: 340px;
+    margin-left: 0;
+  }
+  .auth-card {
+    padding: 2rem;
+  }
+}
+
+/* ---------- Halaman responden ---------- */
+.resp-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.resp-header .inner,
+.resp-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+}
+.resp-header .inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.resp-main {
+  padding-block: 1.5rem 2.5rem;
+}
+.hero-card {
+  border-radius: 20px;
+  padding: 1.5rem 1.25rem;
+  background: linear-gradient(135deg, var(--primary-soft), var(--bg-soft));
+  border: 1px solid var(--border);
+}
+.hero-card h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.steps li {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 0.25rem 0.75rem;
+  align-items: center;
+}
+.steps .pill {
+  grid-column: 2;
+  justify-self: start;
+}
+@media (min-width: 520px) {
+  .steps li {
+    grid-template-columns: 2.25rem 1fr auto;
+  }
+  .steps .pill {
+    grid-column: auto;
+  }
+}
+.step-num {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.step-title {
+  font-weight: 700;
+}
+.pill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--bg-soft);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tip-card {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+.tip-card .icon {
+  font-size: 1.4rem;
+  line-height: 1;
 }
 
 /* Kartu kode cetak */

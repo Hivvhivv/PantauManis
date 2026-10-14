@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
+import { Logo } from "@/components/Logo";
 import { resolveStaffSession } from "@/server/auth/sessions";
 import { STAFF_COOKIE } from "@/server/http/cookies";
 import { ChangePasswordForm } from "./ChangePasswordForm";
@@ -15,7 +16,7 @@ export default async function ChangePasswordPage() {
   return (
     <main className="narrow stack">
       <div className="row spread">
-        <p className="brand">PantauManis</p>
+        <Logo />
         <LogoutButton kind="staff" />
       </div>
       <h1>Ganti Kata Sandi</h1>
