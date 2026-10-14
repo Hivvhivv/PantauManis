@@ -15,6 +15,7 @@ import {
   PointElement,
   Tooltip,
   type ChartConfiguration,
+  type ChartDataset,
 } from "chart.js";
 import { categoryColor } from "@/lib/palette";
 
@@ -51,13 +52,32 @@ function useChart(make: () => ChartConfiguration, deps: unknown[]) {
 
 const grid = { color: () => css("--border") };
 
+/** Garis target pribadi (putus-putus), bila ada. */
+function targetLine(labels: string[], target: number | null | undefined): ChartDataset<"line">[] {
+  if (target === null || target === undefined) return [];
+  return [
+    {
+      type: "line",
+      label: "Target kamu",
+      data: labels.map(() => target),
+      borderColor: css("--accent"),
+      borderDash: [6, 6],
+      borderWidth: 2,
+      pointRadius: 0,
+      fill: false,
+    },
+  ];
+}
+
 /** Grafik garis: perkiraan gula. Nilai null = Belum diisi (celah, tidak digambar sebagai 0). */
 export function SugarLineChart({
   labels,
   values,
+  target,
 }: {
   labels: string[];
   values: (number | null)[];
+  target?: number | null;
 }) {
   const ref = useChart(
     () => ({
@@ -80,6 +100,7 @@ export function SugarLineChart({
             pointBorderColor: css("--primary"),
             pointBorderWidth: 2,
           },
+          ...targetLine(labels, target),
         ],
       },
       options: {
@@ -87,7 +108,14 @@ export function SugarLineChart({
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          tooltip: { callbacks: { label: (c) => ` ±${c.parsed.y} g (perkiraan)` } },
+          tooltip: {
+            callbacks: {
+              label: (c) =>
+                c.dataset.label === "Target kamu"
+                  ? ` Target: ${c.parsed.y} g`
+                  : ` ±${c.parsed.y} g (perkiraan)`,
+            },
+          },
         },
         scales: {
           y: { beginAtZero: true, grid },
@@ -95,7 +123,7 @@ export function SugarLineChart({
         },
       },
     }),
-    [labels.join(), values.join()],
+    [labels.join(), values.join(), target],
   );
   return (
     <div className="chart-box">
@@ -107,9 +135,11 @@ export function SugarLineChart({
 export function DrinksBarChart({
   labels,
   values,
+  target,
 }: {
   labels: string[];
   values: (number | null)[];
+  target?: number | null;
 }) {
   const ref = useChart(
     () => ({
@@ -124,6 +154,8 @@ export function DrinksBarChart({
             borderRadius: 6,
             maxBarThickness: 36,
           },
+          // Garis target di atas grafik batang (chart campuran).
+          ...(targetLine(labels, target) as unknown as ChartDataset<"bar">[]),
         ],
       },
       options: {
@@ -136,7 +168,7 @@ export function DrinksBarChart({
         },
       },
     }),
-    [labels.join(), values.join()],
+    [labels.join(), values.join(), target],
   );
   return (
     <div className="chart-box small">

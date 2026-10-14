@@ -173,9 +173,11 @@ FR-R-06 Target dan umpan balik
 • Responden menetapkan target, misalnya "maksimal 1 minuman manis per hari" atau "maksimal 25 g gula tambahan dari minuman per hari".
 • Umpan balik otomatis berbasis aturan (contoh: "Kamu mencapai target 4 dari 7 hari minggu ini"), bernada positif, tanpa label risiko kesehatan.
 • Target dapat diubah maksimal sekali per minggu; riwayat perubahan target disimpan.
+• Keputusan 2026-10-14: satu target aktif, pilih jenisnya (jumlah minuman/hari ATAU gram gula/hari). Progres dinilai dari 7 hari terakhir sejak target berlaku; hari Nol dinilai (0), hari Belum diisi tidak dinilai dan disebut terpisah. Garis target tampil di grafik yang sesuai.
 FR-R-07 Posttest
 • Posttest terbuka otomatis pada hari ke-14 (atau sesuai protokol) dan ditutup setelah masa tenggang, misalnya 3 hari.
 • Setelah posttest terkirim, Responden melihat halaman terima kasih dan ringkasan progres; akses pencatatan dapat dikunci.
+• Keputusan: posttest terbuka hari ke-[durasi] sampai hari ke-[durasi + masa tenggang] (default 14–17). Pencatatan tidak dikunci setelah posttest. Beranda menampilkan pengingat saat posttest terbuka.
 6. Kebutuhan Fungsional — Admin
 Admin memiliki lima menu: Dashboard, List Responden, Materi Edukasi, Referensi Minuman, dan Ekspor Data.
 FR-A-01 Dashboard agregat
@@ -185,6 +187,7 @@ Menampilkan data gabungan seluruh responden (tanpa identitas per orang) dengan f
 • Komposisi jenis minuman seluruh responden.
 • Corong penyelesaian: kode dibuat → pretest → aktif mencatat → posttest.
 • Daftar "Perlu perhatian": responden yang belum mengisi 2 hari berturut-turut atau belum posttest saat periode berakhir.
+• Definisi status: Belum mulai = belum pretest; Aktif = sudah pretest, belum posttest; Selesai = posttest terkirim; Nonaktif = akses dinonaktifkan. Filter rentang tanggal memakai tanggal pretest (hari ke-1). Rata-rata per hari ke- hanya dari responden yang mencatat (Terisi/Nol) di hari itu, disertai n.
 FR-A-02 List Responden
 Tabel responden dengan pencarian (ID/label), filter (status, belum pretest, kelengkapan < 50%), urutan, dan paginasi 20 baris per halaman.
 Kolom
@@ -242,6 +245,7 @@ FR-A-04 Tombol "Lihat Hasil Responden"
 • Isi hasil: grafik yang sama dengan Dashboard Responden (gula harian, jumlah minuman, komposisi jenis, kalender kelengkapan), progres target dan riwayat perubahannya, tabel log konsumsi lengkap, jawaban dan skor pretest vs posttest, serta materi edukasi yang sudah dibaca dan hasil kuisnya.
 • Tersedia tombol "Sembunyikan Hasil" dan "Ekspor Data Responden Ini".
 • Setiap kali hasil dibuka, sistem mencatat di log audit: siapa, kapan, dan responden mana.
+• Implementasi: lihat ADR-006. Tombol "Ekspor Data Responden Ini" dikerjakan di Fase 4 bersama ekspor lain.
 FR-A-05 Materi Edukasi
 • CRUD materi (judul, ringkasan, isi teks/gambar/video, sumber referensi, kuis), status Draf/Terbit, dan jadwal tampil (hari ke-N atau langsung).
 • Mengubah urutan materi dengan drag-and-drop.
@@ -479,6 +483,7 @@ Pengembangan dibagi empat fase agar fitur inti siap diuji coba sebelum rekrutmen
 1. Fase 1 — Fondasi: ADR, skema basis data, autentikasi dua jalur (staf dan kode akses), manajemen pengguna Superadmin, List Responden dan pembuatan kode.
 2. Fase 2 — Inti Responden: persetujuan, pretest, pencatatan konsumsi (termasuk Nol), Dashboard Responden, riwayat.
 3. Fase 3 — Intervensi & Pemantauan: edukasi, target dan umpan balik, posttest, Dashboard Admin agregat, Detail Responden dengan "Lihat Hasil Responden".
+   - Dipecah (2026-10-14): 3a = target & umpan balik, posttest, Lihat Hasil Responden, Dashboard Admin agregat, Pengaturan Penelitian (FR-S-04); 3b = edukasi (CMS, urutan drag-and-drop, kuis, media diunggah ke Supabase Storage).
 4. Fase 4 — Data & Kesiapan: ekspor, log audit, uji e2e penuh, uji coba (pilot) dengan 3–5 responden, perbaikan sebelum penelitian dimulai.
 Pertanyaan terbuka
 [x] Apakah kode akses perlu tetap terlihat di List Responden? Ya, disimpan terenkripsi (ADR-004).

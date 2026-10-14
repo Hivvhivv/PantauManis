@@ -11,6 +11,8 @@ import { formatLocalDate } from "@/lib/format";
 import { categoryColor } from "@/lib/palette";
 import { respondentAtStage } from "@/server/auth/page-guards";
 import { getDashboard } from "@/server/modules/consumption/dashboard";
+import { getGoalState } from "@/server/modules/goals/service";
+import { posttestInfo } from "@/server/modules/questionnaires/service";
 import { RANGES, type DayState, type RangeKey } from "@/server/modules/study/series";
 
 export const metadata: Metadata = { title: "Beranda" };
@@ -74,7 +76,10 @@ export default async function BerandaPage({
   const sp = await searchParams;
   const range: RangeKey =
     typeof sp.range === "string" && sp.range in RANGES ? (sp.range as RangeKey) : "2w";
-  const d = await getDashboard(r, range);
+  const [d, g, pt] = await Promise.all([getDashboard(r, range), getGoalState(r), posttestInfo(r)]);
+  // Garis target hanya pada grafik harian (bukan agregat mingguan 1 tahun).
+  const sugarTarget = g.active?.metric === "sugar" && !d.weeks ? g.active.targetValue : null;
+  const drinksTarget = g.active?.metric === "drinks" && !d.weeks ? g.active.targetValue : null;
   const t = d.todayPoint;
   const inPeriod = d.studyDay <= d.durationDays;
 
@@ -103,6 +108,22 @@ export default async function BerandaPage({
         <p className="alert alert-info" role="status">
           🎉 Catatanmu tersimpan. Terima kasih sudah mencatat!
         </p>
+      )}
+
+      {pt.state === "open" && (
+        <Link className="reminder" href="/posttest">
+          <span className="stat-icon" aria-hidden="true">
+            <Icon name="check" />
+          </span>
+          <span>
+            <strong>Kuesioner akhir sudah tersedia</strong>
+            <br />
+            <span className="small">
+              Isi sebelum {formatLocalDate(pt.closes!)}. Hanya beberapa menit!
+            </span>
+          </span>
+          <Icon name="chevron" />
+        </Link>
       )}
 
       {/* Sapaan */}
@@ -207,6 +228,24 @@ export default async function BerandaPage({
         {t.state === "zero" && <ZeroDayButton date={d.today} undo />}
       </section>
 
+      {/* Target pribadi */}
+      <section className="card target-card" aria-labelledby="goal-h">
+        <span className="stat-icon big" aria-hidden="true">
+          <Icon name="target" size={26} />
+        </span>
+        <div>
+          <h2 id="goal-h" style={{ margin: 0, fontSize: "1.1rem" }}>
+            {g.active ? g.active.label : "Belum ada target"}
+          </h2>
+          <p className="small" style={{ margin: "0.2rem 0 0" }}>
+            {g.message}
+          </p>
+        </div>
+        <Link className="btn btn-sm" href="/target">
+          {g.active ? "Lihat target" : "Tetapkan target"}
+        </Link>
+      </section>
+
       {/* Grafik + komposisi */}
       <div className="dash-grid two-one">
         <section className="card stack" aria-labelledby="chart-h">
@@ -234,9 +273,9 @@ export default async function BerandaPage({
           <h3 className="chart-title">
             Perkiraan gula <span className="muted">(gram)</span>
           </h3>
-          <SugarLineChart labels={labels} values={sugar} />
+          <SugarLineChart labels={labels} values={sugar} target={sugarTarget} />
           <h3 className="chart-title">Jumlah minuman</h3>
-          <DrinksBarChart labels={labels} values={drinks} />
+          <DrinksBarChart labels={labels} values={drinks} target={drinksTarget} />
           <p className="small" style={{ margin: 0 }}>
             <strong>Ringkasan:</strong> {d.summary.totalDrinks} porsi minuman manis dengan perkiraan
             gula total ±{d.summary.totalSugar} g. Tercatat {d.summary.recordedDays} hari (termasuk{" "}

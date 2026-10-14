@@ -1,6 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const RESPONDENT_PATHS = ["/persetujuan", "/pretest", "/beranda", "/catat", "/riwayat"];
+const RESPONDENT_PATHS = [
+  "/persetujuan",
+  "/pretest",
+  "/beranda",
+  "/catat",
+  "/riwayat",
+  "/target",
+  "/posttest",
+];
 
 /**
  * Pengalihan kasar saja: tanpa cookie sesi → halaman masuk.
@@ -28,5 +36,7 @@ export const config = {
     "/beranda/:path*",
     "/catat/:path*",
     "/riwayat/:path*",
+    "/target/:path*",
+    "/posttest/:path*",
   ],
 };

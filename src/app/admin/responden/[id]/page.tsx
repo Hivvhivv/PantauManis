@@ -8,6 +8,7 @@ import { getRespondentDetail } from "@/server/modules/respondents/service";
 import { formatDateTime, formatPlainDate, studyDayLabel } from "@/lib/format";
 import { CodeReveal } from "../CodeReveal";
 import { RespondentActions } from "../RespondentActions";
+import { ResultsPanel } from "./ResultsPanel";
 
 export const metadata: Metadata = { title: "Detail Responden" };
 
@@ -112,6 +113,8 @@ export default async function RespondentDetailPage({
           showLinks={false}
         />
       </section>
+
+      <ResultsPanel id={r.id} />
 
       <section className="card">
         <h2 style={{ marginTop: 0 }}>Riwayat tindakan</h2>

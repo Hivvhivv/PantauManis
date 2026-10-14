@@ -568,7 +568,7 @@ dl.meta dd {
   bottom: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   background: var(--surface);
   border-top: 1px solid var(--border);
   box-shadow: 0 -4px 16px rgba(94, 60, 30, 0.06);
@@ -1552,6 +1552,130 @@ legend {
   .log-est {
     order: 4;
   }
+}
+
+/* ---------- Target & posttest ---------- */
+.reminder {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  text-decoration: none;
+  border: 1px solid var(--border);
+}
+.reminder:hover {
+  color: var(--warning-text);
+  filter: brightness(0.98);
+}
+.target-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: center;
+}
+.target-card .btn {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+@media (min-width: 720px) {
+  .target-card {
+    grid-template-columns: auto 1fr auto;
+  }
+  .target-card .btn {
+    grid-column: auto;
+  }
+}
+.feedback {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  background: var(--success-bg);
+  color: var(--success-text);
+  font-weight: 700;
+}
+.goal-days {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+  text-align: center;
+}
+.goal-days li {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem 0;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.goal-days .mark {
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.goal-days .yes {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.goal-days .no {
+  background: var(--primary-soft);
+  color: var(--primary-hover);
+}
+.goal-days .none {
+  border-style: dashed;
+  border-color: var(--muted);
+  color: var(--muted);
+}
+
+/* ---------- Dashboard Admin ---------- */
+.admin-stats {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 720px) {
+  .admin-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1100px) {
+  .admin-stats {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+.funnel {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+.results .calendar {
+  max-width: 520px;
+}
+
+.nav-long {
+  display: none;
+}
+@media (min-width: 720px) {
+  .nav-long {
+    display: inline;
+  }
+  .nav-short {
+    display: none;
+  }
+}
+.legend .l-over::before {
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+}
+.goal-days .no {
+  border-color: var(--primary);
 }
 
 /* Kartu kode cetak */

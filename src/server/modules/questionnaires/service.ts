@@ -1,7 +1,9 @@
 import "server-only";
 import { prisma } from "@/server/db";
 import { AppError, businessRule, validationError } from "@/server/http/errors";
-import { localDateOf, toDbDate } from "@/server/modules/study/days";
+import { fromDbDate, localDateOf, toDbDate } from "@/server/modules/study/days";
+import { posttestState, posttestWindow } from "@/server/modules/study/posttest";
+import { getStudySettings } from "@/server/modules/study/settings";
 import type { QuestionnaireType, Respondent } from "@/generated/prisma/client";
 import { scoreAnswers, validateAnswers, type QuestionDef, type QuestionOption } from "./scoring";
 
@@ -54,9 +56,45 @@ export async function getQuestionnaireForRespondent(respondentId: string, type: 
   };
 }
 
-function assertMayAnswer(r: Respondent, type: QuestionnaireType) {
+/** Status posttest responden: belum dibuka / terbuka / ditutup / sudah dikirim (FR-R-07). */
+export async function posttestInfo(r: Respondent, now = new Date()) {
+  const settings = await getStudySettings();
+  const submitted = await prisma.questionnaireResponse.findFirst({
+    where: { respondentId: r.id, status: "submitted", questionnaire: { type: "posttest" } },
+    select: { submittedAt: true },
+  });
+  if (!r.dayOneDate) {
+    return { state: "not_yet" as const, opens: null, closes: null, submittedAt: null };
+  }
+  const dayOne = fromDbDate(r.dayOneDate);
+  const { opens, closes } = posttestWindow(
+    dayOne,
+    settings.durationDays,
+    settings.posttestGraceDays,
+  );
+  return {
+    state: posttestState({
+      dayOne,
+      today: localDateOf(now),
+      durationDays: settings.durationDays,
+      graceDays: settings.posttestGraceDays,
+      submitted: !!submitted,
+    }),
+    opens,
+    closes,
+    submittedAt: submitted?.submittedAt ?? null,
+  };
+}
+
+async function assertMayAnswer(r: Respondent, type: QuestionnaireType, now: Date) {
   if (!r.consentAt) throw businessRule("CONSENT_REQUIRED", "Berikan persetujuan terlebih dahulu.");
-  if (type === "posttest") throw businessRule("POSTTEST_CLOSED", "Kuesioner akhir belum dibuka.");
+  if (type === "posttest") {
+    // Sudah dikirim → biarkan pemeriksaan ALREADY_SUBMITTED di bawah yang menolak.
+    const { state } = await posttestInfo(r, now);
+    if (state === "not_yet")
+      throw businessRule("POSTTEST_NOT_OPEN", "Kuesioner akhir belum dibuka.");
+    if (state === "closed") throw businessRule("POSTTEST_CLOSED", "Kuesioner akhir sudah ditutup.");
+  }
 }
 
 /** Simpan draf (boleh belum lengkap). Ditolak bila sudah dikirim (BR-07). */
@@ -64,8 +102,9 @@ export async function saveDraft(
   r: Respondent,
   type: QuestionnaireType,
   answers: Record<string, string>,
+  now = new Date(),
 ) {
-  assertMayAnswer(r, type);
+  await assertMayAnswer(r, type, now);
   const q = await activeQuestionnaire(type);
   const errors = validateAnswers(toDefs(q.questions), answers, false);
   if (Object.keys(errors).length) throw validationError(errors);
@@ -107,7 +146,7 @@ export async function submit(
   answers: Record<string, string>,
   now = new Date(),
 ) {
-  await saveDraft(r, type, answers);
+  await saveDraft(r, type, answers, now);
   const q = await activeQuestionnaire(type);
   const resp = await prisma.questionnaireResponse.findUniqueOrThrow({
     where: { respondentId_questionnaireId: { respondentId: r.id, questionnaireId: q.id } },

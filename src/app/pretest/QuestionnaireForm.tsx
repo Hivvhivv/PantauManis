@@ -14,9 +14,12 @@ type Question = {
 };
 
 export function QuestionnaireForm({
+  endpoint = "/api/respondent/pretest",
   questions,
   initialAnswers,
 }: {
+  /** Endpoint API kuesioner (pretest atau posttest). */
+  endpoint?: string;
   questions: Question[];
   initialAnswers: Record<string, string>;
 }) {
@@ -32,11 +35,11 @@ export function QuestionnaireForm({
     if (!dirty.current) return;
     setSaveState("saving");
     const t = setTimeout(async () => {
-      const res = await api("/api/respondent/pretest", { method: "PUT", body: { answers } });
+      const res = await api(endpoint, { method: "PUT", body: { answers } });
       setSaveState(res.ok ? "saved" : "error");
     }, 800);
     return () => clearTimeout(t);
-  }, [answers]);
+  }, [answers, endpoint]);
 
   const set = (id: string, value: string) => {
     dirty.current = true;
@@ -50,7 +53,7 @@ export function QuestionnaireForm({
     if (!confirm("Kirim jawaban? Setelah dikirim, jawaban tidak bisa diubah.")) return;
     setBusy(true);
     setError(null);
-    const res = await api<{ redirectTo: string }>("/api/respondent/pretest", { body: { answers } });
+    const res = await api<{ redirectTo: string }>(endpoint, { body: { answers } });
     if (res.ok) return window.location.assign(res.data.redirectTo);
     setError(res.error);
     setBusy(false);

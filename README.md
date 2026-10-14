@@ -12,9 +12,11 @@ Website intervensi self-monitoring konsumsi minuman manis untuk dewasa muda, dip
 
 **Fase 2 (Inti Responden)** selesai: persetujuan, pretest (draf otomatis, terkunci setelah dikirim), pencatatan minuman termasuk "Nol", Dashboard Responden (grafik 1 minggu / 2 minggu / 1 bulan / 1 tahun, kalender 14 hari), riwayat, menu Admin Referensi Minuman, serta kolom progres di List Responden.
 
-Sebelum pilot, peneliti wajib mengganti tiga hal yang masih berupa **CONTOH**: butir kuesioner, nilai gula di Referensi Minuman, dan teks lembar persetujuan.
+Sebelum pilot, peneliti wajib mengganti tiga hal yang masih berupa **CONTOH**: butir kuesioner, nilai gula di Referensi Minuman, dan teks lembar persetujuan (sekarang bisa diubah Superadmin di menu Pengaturan).
 
-Fase berikutnya (edukasi, target, posttest, dashboard agregat, ekspor) belum dikerjakan; lihat PRD bagian 14.
+**Fase 3a** selesai: target pribadi + umpan balik mingguan, posttest (hari ke-14–17), Dashboard Admin agregat, "Lihat Hasil Responden" (dimuat saat diklik, tercatat di audit), dan menu Superadmin **Pengaturan Penelitian** (durasi, masa tenggang, susulan, faktor gula, teks persetujuan).
+
+Fase berikutnya: 3b (edukasi) dan 4 (ekspor, log audit, uji coba); lihat PRD bagian 14.
 
 ## Menjalankan secara lokal
 

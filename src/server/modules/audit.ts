@@ -29,6 +29,9 @@ export const AuditAction = {
   SecurityAlertAcknowledged: "security.alert_acknowledged",
   BeverageTypeCreated: "beverage_type.created",
   BeverageTypeUpdated: "beverage_type.updated",
+  GoalSet: "goal.set",
+  RespondentResultsViewed: "respondent.results_viewed",
+  SettingsUpdated: "settings.updated",
 } as const;
 
 export type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];
@@ -69,6 +72,8 @@ const ACTION_LABELS: Partial<Record<string, string>> = {
   [AuditAction.RespondentActivated]: "Akses diaktifkan",
   [AuditAction.RespondentDeactivated]: "Akses dinonaktifkan",
   [AuditAction.RespondentDeleted]: "Responden dihapus",
+  [AuditAction.RespondentResultsViewed]: "Hasil responden dibuka",
+  [AuditAction.GoalSet]: "Target ditetapkan/diubah",
 };
 
 export function actionLabel(action: string): string {
@@ -92,7 +97,12 @@ export async function respondentHistory(respondentId: string, limit = 50) {
     id: l.id,
     action: l.action,
     label: actionLabel(l.action),
-    actorName: l.actorId ? (names.get(l.actorId) ?? "—") : "Sistem",
+    actorName:
+      l.actorType === "respondent"
+        ? "Responden"
+        : l.actorId
+          ? (names.get(l.actorId) ?? "—")
+          : "Sistem",
     createdAt: l.createdAt,
   }));
 }
