@@ -256,6 +256,7 @@ FR-A-06 Referensi Minuman
 FR-A-07 Ekspor Data
 • Ekspor CSV atau XLSX untuk: daftar responden, log konsumsi (format panjang: satu baris per catatan), ringkasan harian (satu baris per responden per hari, termasuk status Belum diisi/Nol), jawaban pretest/posttest (satu baris per responden), target, dan aktivitas edukasi.
 • File ekspor memakai ID Responden, bukan kode akses. Setiap ekspor tercatat di log audit.
+• Keputusan 2026-10-14 (ADR-007): CSV berkoma (UTF-8) per dataset + XLSX semua dataset dengan sheet Codebook; waktu ISO 8601 WIB (+07:00); jawaban kuesioner berupa kode angka; log konsumsi memuat catatan di luar periode dengan penanda di_luar_periode; ringkasan harian tepat 14 baris per responden, sel kosong (bukan 0) untuk belum_diisi.
 7. Kebutuhan Fungsional — Superadmin
 Superadmin memiliki semua menu Admin, ditambah Manajemen Pengguna, Log Audit, dan Pengaturan Penelitian.
 FR-S-01 Manajemen Pengguna (semua peran)

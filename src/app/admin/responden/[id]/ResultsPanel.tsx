@@ -63,9 +63,14 @@ export function ResultsPanel({ id }: { id: string }) {
         <h2 id="results-h" style={{ margin: 0 }}>
           Hasil responden {data.label}
         </h2>
-        <button type="button" className="btn btn-sm" onClick={() => setData(null)}>
-          Sembunyikan Hasil
-        </button>
+        <span className="row">
+          <a className="btn btn-sm" href={`/api/admin/respondents/${id}/export`} download>
+            Ekspor Data Responden Ini
+          </a>
+          <button type="button" className="btn btn-sm" onClick={() => setData(null)}>
+            Sembunyikan Hasil
+          </button>
+        </span>
       </div>
 
       {!data.started ? (

@@ -36,6 +36,7 @@ export const AuditAction = {
   MaterialUpdated: "education.updated",
   MaterialDeleted: "education.deleted",
   MaterialsReordered: "education.reordered",
+  ExportDownloaded: "export.downloaded",
 } as const;
 
 export type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];
@@ -79,6 +80,7 @@ const ACTION_LABELS: Partial<Record<string, string>> = {
   [AuditAction.RespondentDeleted]: "Responden dihapus",
   [AuditAction.RespondentResultsViewed]: "Hasil responden dibuka",
   [AuditAction.GoalSet]: "Target ditetapkan/diubah",
+  [AuditAction.ExportDownloaded]: "Data responden diekspor",
 };
 
 export function actionLabel(action: string): string {

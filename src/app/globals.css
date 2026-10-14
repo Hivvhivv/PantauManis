@@ -2002,6 +2002,33 @@ legend {
   }
 }
 
+/* ---------- Ekspor ---------- */
+.export-all {
+  display: grid;
+  gap: 0.75rem;
+  align-items: center;
+  background: var(--primary-soft);
+}
+.export-list {
+  list-style: none;
+  margin-inline: 0;
+  margin-bottom: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.export-list li {
+  display: grid;
+  gap: 0.6rem;
+  align-items: center;
+}
+@media (min-width: 720px) {
+  .export-all,
+  .export-list li {
+    grid-template-columns: 1fr auto;
+  }
+}
+
 /* Kartu kode cetak */
 .cards {
   display: grid;
