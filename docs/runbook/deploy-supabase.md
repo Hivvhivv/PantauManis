@@ -54,7 +54,8 @@ Atur di dashboard hosting, bukan di repositori:
 - `DATABASE_URL`: URL pooler 6543 (lihat di atas).
 - `APP_URL`: URL publik aplikasi.
 - `ACCESS_CODE_HMAC_SECRET` dan `ACCESS_CODE_ENC_KEY`: **buat baru khusus production**, jangan memakai nilai lokal. Simpan cadangannya di password manager, terpisah dari backup database. Jika keduanya hilang, semua kode akses yang ada tidak bisa dipakai lagi (ADR-004).
-- `DIRECT_URL` tidak dibutuhkan saat runtime.
+- `DIRECT_URL`: URL session pooler 5432. Tidak dipakai saat runtime, tetapi **wajib diisi di Vercel**, karena `npm install` menjalankan `prisma generate` (postinstall) yang memuat `prisma.config.ts`. Tanpa `DIRECT_URL`, config itu berhenti dengan error, karena `DATABASE_URL` adalah pooler 6543.
+- `STORAGE_DRIVER=supabase` beserta kredensial Storage (bagian Storage di bawah). Folder lokal tidak bisa dipakai di Vercel.
 
 ## Catatan
 
