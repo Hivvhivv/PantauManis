@@ -3,6 +3,7 @@ import Papa from "papaparse";
 import { z } from "zod";
 import {
   dateSchema,
+  fullNameSchema,
   initialsSchema,
   labelSchema,
   notesSchema,
@@ -13,6 +14,7 @@ const IMPORT_MAX_ROWS = 500;
 
 const rowSchema = z.object({
   id_responden: labelSchema,
+  nama: z.preprocess((v) => (v === "" ? undefined : v), fullNameSchema.optional()),
   inisial: z.preprocess((v) => (v === "" ? undefined : v), initialsSchema.optional()),
   tanggal_mulai: z.preprocess((v) => (v === "" ? undefined : v), dateSchema.optional()),
   catatan: z.preprocess((v) => (v === "" ? undefined : v), notesSchema.optional()),
@@ -69,6 +71,7 @@ export function parseImportCsv(text: string): ImportResult {
     const r = result.data;
     rows.push({
       label: r.id_responden,
+      fullName: r.nama,
       initials: r.inisial,
       startDate: r.tanggal_mulai,
       notes: r.catatan,

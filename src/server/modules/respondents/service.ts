@@ -49,6 +49,12 @@ function decryptDigits(encrypted: string): string {
   return decrypt(encrypted, env().ACCESS_CODE_ENC_KEY);
 }
 
+/** Nama lengkap disimpan terenkripsi dengan kunci yang sama dengan kode akses (ADR-009). */
+const encryptName = (name: string | null | undefined) =>
+  name ? encrypt(name, env().ACCESS_CODE_ENC_KEY) : null;
+export const decryptName = (encrypted: string | null) =>
+  encrypted ? decrypt(encrypted, env().ACCESS_CODE_ENC_KEY) : null;
+
 const issuedCode = (id: string, label: string, digits: string): IssuedCode => ({
   id,
   label,
@@ -96,6 +102,7 @@ async function insertRespondents(
       data: {
         label: row.label,
         initials: row.initials ?? null,
+        fullNameEncrypted: encryptName(row.fullName),
         startDate: toDate(row.startDate) ?? null,
         notes: row.notes ?? null,
         accessCodeHmac: code.hmac,
@@ -181,6 +188,7 @@ export async function updateRespondent(id: string, input: RespondentUpdate, acto
     const data: Prisma.RespondentUpdateInput = {
       label: input.label,
       initials: input.initials ?? null,
+      fullNameEncrypted: encryptName(input.fullName),
       startDate: toDate(input.startDate) ?? null,
       notes: input.notes ?? null,
     };
@@ -391,13 +399,21 @@ export async function listRespondents(query: ListQuery) {
 export async function getRespondentDetail(id: string) {
   const r = await prisma.respondent.findFirst({
     where: { id, deletedAt: null },
-    include: { createdBy: { select: { name: true } } },
+    include: {
+      createdBy: { select: { name: true } },
+      responses: {
+        where: { status: "submitted", questionnaire: { type: "posttest" } },
+        select: { submittedAt: true },
+      },
+    },
   });
   if (!r) throw notFound("Responden tidak ditemukan.");
   return {
     id: r.id,
     label: r.label,
     initials: r.initials,
+    fullName: decryptName(r.fullNameEncrypted),
+    posttestSubmittedAt: r.responses[0]?.submittedAt ?? null,
     maskedCode: maskAccessCode(decryptDigits(r.accessCodeEncrypted)),
     accessStatus: r.accessStatus,
     startDate: r.startDate,
@@ -409,6 +425,20 @@ export async function getRespondentDetail(id: string) {
     consentAt: r.consentAt,
     progress: (await progressFor([r])).get(r.id)!,
   };
+}
+
+/** Pilihan dropdown PDF di menu Ekspor: ID + nama lengkap (ADR-009). */
+export async function reportOptions() {
+  const rows = await prisma.respondent.findMany({
+    where: { deletedAt: null },
+    orderBy: { label: "asc" },
+    select: { id: true, label: true, fullNameEncrypted: true },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    label: r.label,
+    fullName: decryptName(r.fullNameEncrypted),
+  }));
 }
 
 /** CSV daftar kode untuk dibagikan saat rekrutmen. Dicatat di audit log. */

@@ -66,6 +66,8 @@ model Respondent {
   /// ID Responden / label penelitian, mis. R001.
   label               String       @unique @map("respondent_code_label") @db.VarChar(20)
   initials            String?      @db.VarChar(10)
+  /// Nama lengkap terenkripsi AES-256-GCM (ADR-009). Hanya untuk Detail Responden dan PDF hasil.
+  fullNameEncrypted   String?      @map("full_name_encrypted")
   /// HMAC-SHA256 kode akses (hex). Dipakai untuk login dan cek keunikan.
   accessCodeHmac      String       @unique @map("access_code_hmac") @db.Char(64)
   /// Kode akses terenkripsi AES-256-GCM (format v1:iv:tag:ciphertext).

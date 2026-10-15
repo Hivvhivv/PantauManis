@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { staffForPage } from "@/server/auth/page-guards";
 import { DATASET_TITLES, DATASETS } from "@/server/modules/export/service";
+import { reportOptions } from "@/server/modules/respondents/service";
 
 export const metadata: Metadata = { title: "Ekspor Data" };
 
@@ -16,6 +17,7 @@ const NOTES: Record<(typeof DATASETS)[number], string> = {
 /** Ekspor data penelitian (FR-A-07). Setiap unduhan dicatat di log audit. */
 export default async function ExportPage() {
   await staffForPage();
+  const people = await reportOptions();
   return (
     <>
       <h1 style={{ margin: 0 }}>Ekspor Data</h1>
@@ -36,6 +38,31 @@ export default async function ExportPage() {
           Unduh semua (XLSX)
         </a>
       </section>
+
+      <form className="card export-all" method="get" action="/admin/ekspor/pdf" target="_blank">
+        <div>
+          <h2 style={{ margin: 0 }}>Laporan PDF</h2>
+          <p className="small muted" style={{ margin: "0.25rem 0 0" }}>
+            Grafik dan ringkasan hasil, termasuk nama responden. Simpan dan bagikan dengan
+            hati-hati.
+          </p>
+          <label htmlFor="pdf-r" style={{ marginTop: "0.75rem" }}>
+            Isi laporan
+          </label>
+          <select id="pdf-r" name="r" defaultValue="semua">
+            <option value="semua">Keseluruhan (semua responden)</option>
+            {people.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+                {p.fullName ? ` – ${p.fullName}` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button className="btn btn-primary" type="submit">
+          Unduh PDF
+        </button>
+      </form>
 
       <ul className="export-list">
         {DATASETS.map((d) => (

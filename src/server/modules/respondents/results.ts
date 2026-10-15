@@ -8,6 +8,8 @@ import { educationActivity } from "@/server/modules/education/service";
 import { getGoalState } from "@/server/modules/goals/service";
 import type { QuestionOption } from "@/server/modules/questionnaires/scoring";
 import { fromDbDate, toLocalDateTime } from "@/server/modules/study/days";
+import type { Respondent } from "@/generated/prisma/client";
+import { decryptName } from "./service";
 
 async function questionnaireResult(respondentId: string, type: "pretest" | "posttest") {
   const q = await prisma.questionnaire.findFirst({
@@ -39,15 +41,37 @@ async function questionnaireResult(respondentId: string, type: "pretest" | "post
  * setiap pemanggilan dicatat di audit log (AC-05).
  */
 export async function getRespondentResults(id: string, actor: Actor) {
-  const r = await prisma.respondent.findFirst({ where: { id, deletedAt: null } });
-  if (!r) throw notFound("Responden tidak ditemukan.");
+  const r = await findRespondent(id);
   await writeAudit({
     actor,
     action: AuditAction.RespondentResultsViewed,
     targetType: "respondent",
     targetId: id,
   });
+  return loadResults(r);
+}
 
+/** PDF hasil satu responden (ADR-009): data yang sama + nama lengkap; dicatat sebagai ekspor. */
+export async function getRespondentReport(id: string, actor: Actor) {
+  const r = await findRespondent(id);
+  await writeAudit({
+    actor,
+    action: AuditAction.ExportDownloaded,
+    targetType: "respondent",
+    targetId: id,
+    metadata: { format: "pdf" },
+  });
+  return { ...(await loadResults(r)), fullName: decryptName(r.fullNameEncrypted) };
+}
+
+async function findRespondent(id: string) {
+  const r = await prisma.respondent.findFirst({ where: { id, deletedAt: null } });
+  if (!r) throw notFound("Responden tidak ditemukan.");
+  return r;
+}
+
+async function loadResults(r: Respondent) {
+  const id = r.id;
   const [pretest, posttest] = await Promise.all([
     questionnaireResult(id, "pretest"),
     questionnaireResult(id, "posttest"),
@@ -94,3 +118,4 @@ export async function getRespondentResults(id: string, actor: Actor) {
 }
 
 export type RespondentResults = Awaited<ReturnType<typeof getRespondentResults>>;
+export type RespondentReport = Awaited<ReturnType<typeof getRespondentReport>>;

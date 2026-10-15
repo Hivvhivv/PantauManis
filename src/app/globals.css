@@ -1992,4 +1992,21 @@ legend {
   .code-card {
     border-color: #000;
   }
+  /* Laporan PDF (ADR-009): tabel tidak terpotong samping, baris tidak terbelah antarhalaman. */
+  .report .table-wrap {
+    overflow: visible;
+  }
+  .report table {
+    min-width: 0 !important;
+    font-size: 0.8rem;
+  }
+  .report tr,
+  .report canvas,
+  .report .stat {
+    break-inside: avoid;
+  }
+  .report h2,
+  .report h3 {
+    break-after: avoid;
+  }
 }

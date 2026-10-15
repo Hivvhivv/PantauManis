@@ -20,6 +20,8 @@ Sebelum pilot, peneliti wajib mengganti tiga hal yang masih berupa **CONTOH**: b
 
 **Fase 4** selesai: Ekspor Data (6 dataset CSV/XLSX + Codebook, ekspor per responden; ADR-007), Log Audit untuk Superadmin, uji e2e alur Admin lengkap, dan runbook [pilot & penutupan penelitian](docs/runbook/pilot-dan-penutupan.md).
 
+**Tambahan 2026-10-15:** nama lengkap responden (opsional, terenkripsi) dan Laporan PDF, per responden (Detail Responden) maupun keseluruhan (menu Ekspor). Lihat ADR-009.
+
 Langkah selanjutnya: jalankan pilot 3–5 responden mengikuti runbook di atas.
 
 ## Menjalankan secara lokal

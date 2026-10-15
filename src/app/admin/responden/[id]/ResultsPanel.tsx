@@ -50,9 +50,12 @@ export function ResultsPanel({ id }: { id: string }) {
             {error}
           </p>
         )}
-        <button type="button" className="btn btn-primary" onClick={load} disabled={loading}>
-          {loading ? "Memuat hasil…" : "Lihat Hasil Responden"}
-        </button>
+        <span className="row">
+          <button type="button" className="btn btn-primary" onClick={load} disabled={loading}>
+            {loading ? "Memuat hasil…" : "Lihat Hasil Responden"}
+          </button>
+          <PdfLink id={id} />
+        </span>
       </section>
     );
   }
@@ -67,6 +70,7 @@ export function ResultsPanel({ id }: { id: string }) {
           <a className="btn btn-sm" href={`/api/admin/respondents/${id}/export`} download>
             Ekspor Data Responden Ini
           </a>
+          <PdfLink id={id} small />
           <button type="button" className="btn btn-sm" onClick={() => setData(null)}>
             Sembunyikan Hasil
           </button>
@@ -87,7 +91,21 @@ export function ResultsPanel({ id }: { id: string }) {
   );
 }
 
-function StartedResults({ data }: { data: Extract<RespondentResults, { started: true }> }) {
+/** PDF hasil responden ini (dibuka di tab baru, dicatat di log audit). */
+function PdfLink({ id, small = false }: { id: string; small?: boolean }) {
+  return (
+    <a
+      className={small ? "btn btn-sm" : "btn"}
+      href={`/admin/responden/${id}/pdf`}
+      target="_blank"
+      rel="noopener"
+    >
+      Unduh PDF
+    </a>
+  );
+}
+
+export function StartedResults({ data }: { data: Extract<RespondentResults, { started: true }> }) {
   const d = data.dashboard;
   const days = d.days.filter((x) => x.state !== "before");
   const recorded = (s: string) => s === "filled" || s === "zero";
@@ -264,7 +282,7 @@ function StartedResults({ data }: { data: Extract<RespondentResults, { started: 
 
 type Q = RespondentResults["pretest"];
 
-function QuestionnaireComparison({ pre, post }: { pre: Q; post: Q }) {
+export function QuestionnaireComparison({ pre, post }: { pre: Q; post: Q }) {
   if (!pre) return null;
   const status = (q: Q) =>
     !q || !q.status

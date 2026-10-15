@@ -38,6 +38,7 @@ Simpan waktu dalam UTC, tampilkan dalam Asia/Jakarta. Ekspor memakai ISO 8601.
 Setiap catatan konsumsi menyimpan snapshot nilai gula saat dibuat (sugar_g_snapshot).
 Semua perubahan skema WAJIB lewat migration. Jangan ubah database secara manual.
 Hapus responden = soft delete.
+Nama lengkap responden (ADR-009) disimpan terenkripsi; hanya tampil di Detail Responden dan PDF staf, tidak pernah di List, ekspor CSV/XLSX, log, atau pesan error.
 Keamanan
 Kata sandi dan kode akses disimpan dalam bentuk hash. Kode akses dibuat acak (bukan berurutan).
 Rahasia hanya di environment variable (.env), jangan pernah di kode sumber atau di-commit.

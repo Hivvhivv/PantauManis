@@ -13,7 +13,7 @@ export default async function ImportPage() {
         <p>Berkas CSV dengan baris pertama berisi nama kolom:</p>
         <pre className="mono small" style={{ overflowX: "auto" }}>
           {
-            "id_responden,inisial,tanggal_mulai,catatan\nR001,AB,2026-11-01,\nR002,,2026-11-01,Kelas pagi"
+            "id_responden,nama,inisial,tanggal_mulai,catatan\nR001,Ani Budiman,AB,2026-11-01,\nR002,,,2026-11-01,Kelas pagi"
           }
         </pre>
         <ul className="small">

@@ -33,7 +33,7 @@ Di luar lingkup v1
 Batasan etis (wajib tampil di website)
 • Website bukan alat diagnosis diabetes dan tidak menggantikan konsultasi tenaga kesehatan. Disclaimer ini tampil di halaman login, dashboard Responden, dan halaman edukasi.
 • Sistem tidak menampilkan label risiko atau diagnosis dari log konsumsi. Umpan balik hanya membandingkan konsumsi dengan target yang dibuat Responden sendiri dan anjuran umum yang bersumber jelas.
-• Data Responden diidentifikasi dengan kode, bukan nama lengkap, untuk menjaga kerahasiaan.
+• Data Responden diidentifikasi dengan kode (ID Responden) di daftar dan ekspor analisis. Keputusan 2026-10-15 (ADR-009): nama lengkap boleh disimpan terenkripsi dan hanya tampil di Detail Responden serta laporan PDF untuk staf; wajib disetujui komite etik dan disebutkan di lembar persetujuan.
 3. Peran Pengguna dan Hak Akses
 Sistem memiliki tiga peran dengan hak akses bertingkat: Superadmin ⊃ Admin ⊃ Responden (khusus data miliknya sendiri).
 Peran
@@ -246,6 +246,7 @@ FR-A-04 Tombol "Lihat Hasil Responden"
 • Tersedia tombol "Sembunyikan Hasil" dan "Ekspor Data Responden Ini".
 • Setiap kali hasil dibuka, sistem mencatat di log audit: siapa, kapan, dan responden mana.
 • Implementasi: lihat ADR-006. Tombol "Ekspor Data Responden Ini" dikerjakan di Fase 4 bersama ekspor lain.
+• Keputusan 2026-10-15 (ADR-009): tombol "Unduh PDF" membuka laporan PDF responden ini (nama, grafik, log konsumsi, target, pretest/posttest, edukasi); dicatat di log audit sebagai ekspor.
 FR-A-05 Materi Edukasi
 • CRUD materi (judul, ringkasan, isi teks/gambar/video, sumber referensi, kuis), status Draf/Terbit, dan jadwal tampil (hari ke-N atau langsung).
 • Mengubah urutan materi dengan drag-and-drop.
@@ -256,6 +257,7 @@ FR-A-06 Referensi Minuman
 FR-A-07 Ekspor Data
 • Ekspor CSV atau XLSX untuk: daftar responden, log konsumsi (format panjang: satu baris per catatan), ringkasan harian (satu baris per responden per hari, termasuk status Belum diisi/Nol), jawaban pretest/posttest (satu baris per responden), target, dan aktivitas edukasi.
 • File ekspor memakai ID Responden, bukan kode akses. Setiap ekspor tercatat di log audit.
+• Keputusan 2026-10-15 (ADR-009): menu Ekspor juga memiliki "Laporan PDF" dengan dropdown: Keseluruhan (agregat + ringkasan per responden dengan nama) atau satu responden. Nama tidak pernah ikut CSV/XLSX.
 • Keputusan 2026-10-14 (ADR-007): CSV berkoma (UTF-8) per dataset + XLSX semua dataset dengan sheet Codebook; waktu ISO 8601 WIB (+07:00); jawaban kuesioner berupa kode angka; log konsumsi memuat catatan di luar periode dengan penanda di_luar_periode; ringkasan harian tepat 14 baris per responden, sel kosong (bukan 0) untuk belum_diisi.
 7. Kebutuhan Fungsional — Superadmin
 Superadmin memiliki semua menu Admin, ditambah Manajemen Pengguna, Log Audit, dan Pengaturan Penelitian.
@@ -293,8 +295,8 @@ staff_users
 id, name, email, password_hash, role (superadmin/admin), is_active, must_change_password, last_login_at, deleted_at
 Akun Admin dan Superadmin
 respondents
-id, respondent_code_label (R001), initials, access_code_hmac (unik), access_code_encrypted, access_status (active/inactive), consent_at, start_date, created_by, notes, last_active_at, deleted_at
-Akun Responden; tidak menyimpan nama lengkap
+id, respondent_code_label (R001), initials, full_name_encrypted, access_code_hmac (unik), access_code_encrypted, access_status (active/inactive), consent_at, start_date, created_by, notes, last_active_at, deleted_at
+Akun Responden; nama lengkap opsional dan terenkripsi (ADR-009)
 respondent_sessions
 id, respondent_id, token_hash, expires_at, user_agent
 Sesi login kode akses
@@ -426,6 +428,8 @@ Daftar ADR yang perlu dibuat
 5. ADR-005 Representasi "Belum diisi" vs "Nol" dan perhitungan hari penelitian.
 6. ADR-006 Strategi lazy loading untuk "Lihat Hasil Responden".
 7. ADR-007 Format dan skema ekspor data penelitian.
+8. ADR-008 Penyimpanan media edukasi.
+9. ADR-009 Nama lengkap responden dan laporan PDF.
 13. Pengujian dan Definition of Done
 Setiap fitur diuji di tiga tingkat dan wajib lulus skenario kontrol akses sebelum dinyatakan selesai.
 Lapisan pengujian

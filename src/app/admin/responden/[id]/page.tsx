@@ -51,6 +51,8 @@ export default async function RespondentDetailPage({
           <dl className="meta">
             <dt>ID Responden</dt>
             <dd>{r.label}</dd>
+            <dt>Nama lengkap</dt>
+            <dd>{r.fullName ?? "—"}</dd>
             <dt>Inisial</dt>
             <dd>{r.initials ?? "—"}</dd>
             <dt>Kode akses</dt>
@@ -89,7 +91,7 @@ export default async function RespondentDetailPage({
                 : "—"}
             </dd>
             <dt>Posttest</dt>
-            <dd>Belum</dd>
+            <dd>{r.posttestSubmittedAt ? formatDateTime(r.posttestSubmittedAt) : "Belum"}</dd>
             <dt>Terakhir aktif</dt>
             <dd>{formatDateTime(r.lastActiveAt)}</dd>
           </dl>

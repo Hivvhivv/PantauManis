@@ -4,6 +4,7 @@ import { FieldError } from "./FieldError";
 export type RespondentDefaults = {
   label?: string;
   initials?: string | null;
+  fullName?: string | null;
   startDate?: string;
   notes?: string | null;
 };
@@ -41,8 +42,25 @@ export function RespondentFields({
         <FieldError error={error} name="label" />
       </div>
       <div>
+        <label htmlFor="fullName">
+          Nama lengkap{" "}
+          <span className="hint">
+            opsional; disimpan terenkripsi, hanya tampil di Detail dan PDF
+          </span>
+        </label>
+        <input
+          id="fullName"
+          name="fullName"
+          defaultValue={defaults.fullName ?? ""}
+          maxLength={100}
+          autoComplete="off"
+          aria-invalid={error?.fields.fullName ? true : undefined}
+        />
+        <FieldError error={error} name="fullName" />
+      </div>
+      <div>
         <label htmlFor="initials">
-          Label/inisial <span className="hint">opsional, bukan nama lengkap</span>
+          Label/inisial <span className="hint">opsional</span>
         </label>
         <input
           id="initials"
@@ -79,6 +97,7 @@ export function respondentFormValues(form: FormData) {
   return {
     label: String(form.get("label") ?? ""),
     initials: String(form.get("initials") ?? ""),
+    fullName: String(form.get("fullName") ?? ""),
     startDate: String(form.get("startDate") ?? ""),
     notes: String(form.get("notes") ?? ""),
   };

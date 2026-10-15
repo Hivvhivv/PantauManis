@@ -29,6 +29,7 @@ export default async function EditRespondentPage({ params }: { params: Promise<{
         defaults={{
           label: r.label,
           initials: r.initials,
+          fullName: r.fullName,
           startDate: toDateInput(r.startDate),
           notes: r.notes,
         }}

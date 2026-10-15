@@ -10,6 +10,7 @@ Fase 4 PRD: uji coba (pilot) dengan 3–5 responden sebelum rekrutmen penuh.
 - [ ] Instrumen pretest/posttest final: dimasukkan lewat migration baru (minta bantuan pengembang). Instrumen CONTOH dinonaktifkan (`is_active = false`), bukan dihapus.
 - [ ] Nilai gula di **Referensi Minuman**: isi sumber, lalu hilangkan centang "perlu diverifikasi". Peringatan kuning di halaman itu harus hilang.
 - [ ] Materi **Edukasi** diterbitkan, dengan jadwal hari ke-N bila perlu.
+- [ ] Penyimpanan **nama lengkap** responden disetujui komite etik dan disebutkan di teks persetujuan (ADR-009). Jika tidak disetujui, kosongkan kolom Nama lengkap.
 
 **Pengaturan (menu Pengaturan):** durasi 14 hari, masa tenggang posttest 3 hari, batas susulan 2 hari, faktor tingkat gula.
 

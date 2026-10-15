@@ -17,6 +17,13 @@ export const initialsSchema = z
   .toUpperCase()
   .regex(/^[A-Z. ]{1,10}$/, "Inisial hanya huruf (maks. 10 karakter).");
 
+/** Nama lengkap (ADR-009): disimpan terenkripsi, tidak pernah ikut ekspor CSV/XLSX. */
+export const fullNameSchema = z
+  .string()
+  .trim()
+  .max(100, "Nama maksimal 100 karakter.")
+  .regex(/^[\p{L} .,'-]+$/u, "Nama hanya boleh huruf, spasi, titik, koma, apostrof, dan strip.");
+
 export const dateSchema = z.iso.date({ error: "Tanggal tidak valid (format TTTT-BB-HH)." });
 
 export const notesSchema = z.string().trim().max(2000, "Catatan maksimal 2.000 karakter.");
@@ -25,6 +32,7 @@ export const respondentInputSchema = z.object({
   /** Kosong = dibuat otomatis (Rxxx berikutnya). */
   label: z.preprocess(emptyToUndefined, labelSchema.optional()),
   initials: z.preprocess(emptyToUndefined, initialsSchema.optional()),
+  fullName: z.preprocess(emptyToUndefined, fullNameSchema.optional()),
   startDate: z.preprocess(emptyToUndefined, dateSchema.optional()),
   notes: z.preprocess(emptyToUndefined, notesSchema.optional()),
 });
@@ -33,6 +41,7 @@ export type RespondentInput = z.infer<typeof respondentInputSchema>;
 export const respondentUpdateSchema = z.object({
   label: labelSchema,
   initials: z.preprocess(emptyToUndefined, initialsSchema.nullish()),
+  fullName: z.preprocess(emptyToUndefined, fullNameSchema.nullish()),
   startDate: z.preprocess(emptyToUndefined, dateSchema.nullish()),
   notes: z.preprocess(emptyToUndefined, notesSchema.nullish()),
 });
