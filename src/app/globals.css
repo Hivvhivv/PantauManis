@@ -1930,30 +1930,273 @@ legend {
   }
 }
 
-/* ---------- Ekspor ---------- */
-.export-all {
-  display: grid;
-  gap: 0.75rem;
-  align-items: center;
-  background: var(--primary-soft);
+/* ---------- Ekspor PDF (menu checkbox) ---------- */
+.export-menu {
+  position: relative;
 }
-.export-list {
+.export-menu > summary {
   list-style: none;
-  margin-inline: 0;
-  margin-bottom: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.75rem;
 }
-.export-list li {
+.export-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.export-panel {
+  position: absolute;
+  right: 0;
+  z-index: 20;
+  margin-top: 0.4rem;
+  width: min(360px, calc(100vw - 2rem));
+  box-shadow: var(--shadow);
+}
+.check-list {
   display: grid;
+  gap: 0.35rem;
+}
+.check-list label {
+  display: flex;
   gap: 0.6rem;
   align-items: center;
+  font-weight: 400;
+  margin: 0;
+  min-height: 32px;
 }
-@media (min-width: 720px) {
-  .export-all,
-  .export-list li {
-    grid-template-columns: 1fr auto;
+.check-list input {
+  width: 1.1rem;
+  height: 1.1rem;
+  min-height: 0;
+}
+
+/* ---------- Laporan PDF (ADR-009): A4, selalu palet terang ---------- */
+.report {
+  --text: #2b211a;
+  --muted: #6e5c4e;
+  --border: #e3d5c2;
+  --surface: #ffffff;
+  --bg-soft: #f6eee3;
+  --primary: #9c5b2e;
+  --primary-soft: #f3e3d0;
+  --primary-text: #ffffff;
+  --accent: #8a9a5b;
+  color-scheme: light;
+  /* Lebar ≈ area cetak A4 (186 mm), agar grafik digambar pada ukuran yang sama dengan hasil cetak. */
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.9rem;
+  display: grid;
+  gap: 1.25rem;
+}
+.report-cover {
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #9c5b2e, #c98a55);
+  color: #fff;
+}
+.report-brand {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.report-secret {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.report-cover h1 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.6rem;
+}
+.report-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.75rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.report-meta dt {
+  opacity: 0.85;
+}
+.report-meta dd {
+  margin: 0;
+  font-weight: 700;
+}
+.report-page {
+  display: grid;
+  gap: 0.9rem;
+}
+.report-page > *,
+.report-block > *,
+.report-cols > * {
+  min-width: 0;
+}
+.report canvas {
+  max-width: 100% !important;
+}
+.report-person {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 3px solid var(--primary);
+}
+.report-person h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+.report-id {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+.report-chip {
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.report-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+.report-kpi {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  border-left: 4px solid var(--primary);
+}
+.report-kpi span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.report-kpi strong {
+  font-size: 1.2rem;
+}
+.report-block {
+  display: grid;
+  gap: 0.6rem;
+}
+.report-h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0;
+  font-size: 1.1rem;
+}
+.report-num {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.85rem;
+}
+.report-h3 {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.report-cols {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.report-comp {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+.report-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.report-table th,
+.report-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+.report-table thead th {
+  background: var(--primary);
+  color: #fff;
+}
+.report-table tbody tr:nth-child(even) {
+  background: var(--bg-soft);
+}
+.report-total {
+  font-weight: 800;
+}
+.report-funnel {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+.report-funnel div {
+  display: grid;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--primary-soft);
+  text-align: center;
+}
+.report-funnel strong {
+  font-size: 1.2rem;
+}
+.report-funnel span {
+  font-size: 0.75rem;
+}
+.report-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+}
+.report-calendar .cal-day {
+  aspect-ratio: auto;
+  padding: 0.3rem;
+  display: grid;
+  gap: 0;
+  font-size: 0.7rem;
+}
+.report-calendar .cal-day strong {
+  font-size: 0.95rem;
+}
+.report-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+}
+.report-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  .report-cols,
+  .report-comp {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1992,21 +2235,47 @@ legend {
   .code-card {
     border-color: #000;
   }
-  /* Laporan PDF (ADR-009): tabel tidak terpotong samping, baris tidak terbelah antarhalaman. */
-  .report .table-wrap {
-    overflow: visible;
+  /* Laporan PDF: setiap responden mulai di halaman baru; warna latar ikut tercetak. */
+  @page {
+    size: A4;
+    margin: 12mm;
   }
-  .report table {
-    min-width: 0 !important;
-    font-size: 0.8rem;
+  main.container {
+    max-width: none;
+    padding: 0;
+  }
+  .report {
+    max-width: none;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Alur blok (bukan grid) agar Chrome menghormati break-after pada judul. */
+  .report,
+  .report-page,
+  .report-block {
+    display: block;
+  }
+  .report > * + *,
+  .report-page > * + *,
+  .report-block > * + * {
+    margin-top: 0.7rem;
+  }
+  .report-page + .report-page {
+    break-before: page;
   }
   .report tr,
   .report canvas,
-  .report .stat {
+  .report-kpi,
+  .report-funnel,
+  .report-calendar {
     break-inside: avoid;
   }
-  .report h2,
-  .report h3 {
+  .report-h2,
+  .report-h3 {
     break-after: avoid;
+  }
+  .report-table thead {
+    display: table-header-group;
   }
 }

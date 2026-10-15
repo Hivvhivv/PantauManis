@@ -179,7 +179,7 @@ FR-R-07 Posttest
 • Setelah posttest terkirim, Responden melihat halaman terima kasih dan ringkasan progres; akses pencatatan dapat dikunci.
 • Keputusan: posttest terbuka hari ke-[durasi] sampai hari ke-[durasi + masa tenggang] (default 14–17). Pencatatan tidak dikunci setelah posttest. Beranda menampilkan pengingat saat posttest terbuka.
 6. Kebutuhan Fungsional — Admin
-Admin memiliki lima menu: Dashboard, List Responden, Materi Edukasi, Referensi Minuman, dan Ekspor Data.
+Admin memiliki empat menu: Dashboard, List Responden, Materi Edukasi, dan Referensi Minuman. (Menu Ekspor Data dihapus 2026-10-15; ekspor ada di tombol "Ekspor PDF" List/Detail Responden, ADR-009.)
 FR-A-01 Dashboard agregat
 Menampilkan data gabungan seluruh responden (tanpa identitas per orang) dengan filter rentang tanggal dan status:
 • Kartu ringkasan: total responden, jumlah per status (Belum mulai, Aktif, Selesai, Nonaktif), rata-rata kelengkapan pencatatan, persentase pretest dan posttest selesai.
@@ -246,7 +246,7 @@ FR-A-04 Tombol "Lihat Hasil Responden"
 • Tersedia tombol "Sembunyikan Hasil" dan "Ekspor Data Responden Ini".
 • Setiap kali hasil dibuka, sistem mencatat di log audit: siapa, kapan, dan responden mana.
 • Implementasi: lihat ADR-006. Tombol "Ekspor Data Responden Ini" dikerjakan di Fase 4 bersama ekspor lain.
-• Keputusan 2026-10-15 (ADR-009): tombol "Unduh PDF" membuka laporan PDF responden ini (nama, grafik, log konsumsi, target, pretest/posttest, edukasi); dicatat di log audit sebagai ekspor.
+• Keputusan 2026-10-15 (ADR-009): tombol "Ekspor PDF" di Detail Responden membuka checkbox bagian (ringkasan & grafik, kalender, log konsumsi, target, pretest/posttest, edukasi) untuk PDF responden ini, beserta tautan "Ekspor Data Responden Ini (XLSX)"; dicatat di log audit sebagai ekspor.
 FR-A-05 Materi Edukasi
 • CRUD materi (judul, ringkasan, isi teks/gambar/video, sumber referensi, kuis), status Draf/Terbit, dan jadwal tampil (hari ke-N atau langsung).
 • Mengubah urutan materi dengan drag-and-drop.
@@ -257,10 +257,10 @@ FR-A-06 Referensi Minuman
 FR-A-07 Ekspor Data
 • Ekspor CSV atau XLSX untuk: daftar responden, log konsumsi (format panjang: satu baris per catatan), ringkasan harian (satu baris per responden per hari, termasuk status Belum diisi/Nol), jawaban pretest/posttest (satu baris per responden), target, dan aktivitas edukasi.
 • File ekspor memakai ID Responden, bukan kode akses. Setiap ekspor tercatat di log audit.
-• Keputusan 2026-10-15 (ADR-009): menu Ekspor juga memiliki "Laporan PDF" dengan dropdown: Keseluruhan (agregat + ringkasan per responden dengan nama) atau satu responden. Nama tidak pernah ikut CSV/XLSX.
+• Keputusan 2026-10-15 (ADR-009): menu Ekspor Data dihapus. Tombol "Ekspor PDF" di List Responden membuka checkbox bagian untuk satu PDF berisi semua responden (opsional dengan ringkasan keseluruhan), serta tautan "Unduh XLSX (data analisis)" berisi semua dataset + Codebook. Nama tidak pernah ikut CSV/XLSX.
 • Keputusan 2026-10-14 (ADR-007): CSV berkoma (UTF-8) per dataset + XLSX semua dataset dengan sheet Codebook; waktu ISO 8601 WIB (+07:00); jawaban kuesioner berupa kode angka; log konsumsi memuat catatan di luar periode dengan penanda di_luar_periode; ringkasan harian tepat 14 baris per responden, sel kosong (bukan 0) untuk belum_diisi.
 7. Kebutuhan Fungsional — Superadmin
-Superadmin memiliki semua menu Admin, ditambah Manajemen Pengguna, Log Audit, dan Pengaturan Penelitian.
+Superadmin memiliki semua menu Admin, ditambah Manajemen Pengguna dan Pengaturan Penelitian. (Menu Log Audit dihapus 2026-10-15; pencatatan tetap berjalan, ADR-009.)
 FR-S-01 Manajemen Pengguna (semua peran)
 • Satu tabel untuk semua pengguna dengan filter peran (Semua / Superadmin / Admin / Responden), pencarian, dan status.
 • Form Tambah/Edit Pengguna dengan dropdown Peran: Superadmin, Admin, Responden. Kolom form menyesuaikan pilihan:
@@ -280,6 +280,7 @@ FR-S-02 Aturan perubahan peran
 • Superadmin tidak dapat menurunkan peran, menonaktifkan, atau menghapus akunnya sendiri, dan sistem menolak aksi yang membuat jumlah Superadmin aktif menjadi nol.
 FR-S-03 Log Audit
 • Mencatat: login/logout staf, pembuatan/edit/hapus pengguna, perubahan peran, reset kode/kata sandi, pembukaan "Lihat Hasil Responden", dan ekspor data.
+• Keputusan 2026-10-15 (ADR-009): menu Log Audit dihapus dari aplikasi; pencatatan tetap berjalan dan dapat diperiksa langsung di database. Riwayat tindakan per responden tetap tampil di Detail Responden.
 • Kolom: waktu, pelaku, aksi, target, alamat IP. Log hanya bisa dibaca, tidak bisa diubah atau dihapus dari aplikasi.
 FR-S-04 Pengaturan Penelitian
 • Durasi periode (default 14 hari), masa tenggang posttest (default 3 hari), batas pengisian susulan (default 2 hari), zona waktu (Asia/Jakarta), dan teks disclaimer/persetujuan.

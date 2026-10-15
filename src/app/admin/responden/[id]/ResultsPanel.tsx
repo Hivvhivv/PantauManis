@@ -50,12 +50,9 @@ export function ResultsPanel({ id }: { id: string }) {
             {error}
           </p>
         )}
-        <span className="row">
-          <button type="button" className="btn btn-primary" onClick={load} disabled={loading}>
-            {loading ? "Memuat hasil…" : "Lihat Hasil Responden"}
-          </button>
-          <PdfLink id={id} />
-        </span>
+        <button type="button" className="btn btn-primary" onClick={load} disabled={loading}>
+          {loading ? "Memuat hasil…" : "Lihat Hasil Responden"}
+        </button>
       </section>
     );
   }
@@ -66,15 +63,9 @@ export function ResultsPanel({ id }: { id: string }) {
         <h2 id="results-h" style={{ margin: 0 }}>
           Hasil responden {data.label}
         </h2>
-        <span className="row">
-          <a className="btn btn-sm" href={`/api/admin/respondents/${id}/export`} download>
-            Ekspor Data Responden Ini
-          </a>
-          <PdfLink id={id} small />
-          <button type="button" className="btn btn-sm" onClick={() => setData(null)}>
-            Sembunyikan Hasil
-          </button>
-        </span>
+        <button type="button" className="btn btn-sm" onClick={() => setData(null)}>
+          Sembunyikan Hasil
+        </button>
       </div>
 
       {!data.started ? (
@@ -91,21 +82,7 @@ export function ResultsPanel({ id }: { id: string }) {
   );
 }
 
-/** PDF hasil responden ini (dibuka di tab baru, dicatat di log audit). */
-function PdfLink({ id, small = false }: { id: string; small?: boolean }) {
-  return (
-    <a
-      className={small ? "btn btn-sm" : "btn"}
-      href={`/admin/responden/${id}/pdf`}
-      target="_blank"
-      rel="noopener"
-    >
-      Unduh PDF
-    </a>
-  );
-}
-
-export function StartedResults({ data }: { data: Extract<RespondentResults, { started: true }> }) {
+function StartedResults({ data }: { data: Extract<RespondentResults, { started: true }> }) {
   const d = data.dashboard;
   const days = d.days.filter((x) => x.state !== "before");
   const recorded = (s: string) => s === "filled" || s === "zero";
@@ -282,7 +259,7 @@ export function StartedResults({ data }: { data: Extract<RespondentResults, { st
 
 type Q = RespondentResults["pretest"];
 
-export function QuestionnaireComparison({ pre, post }: { pre: Q; post: Q }) {
+function QuestionnaireComparison({ pre, post }: { pre: Q; post: Q }) {
   if (!pre) return null;
   const status = (q: Q) =>
     !q || !q.status

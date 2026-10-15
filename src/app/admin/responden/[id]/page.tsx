@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PdfExportMenu } from "@/components/PdfExportMenu";
+import { RESPONDENT_SECTIONS } from "@/lib/pdf-sections";
 import { staffForPage } from "@/server/auth/page-guards";
 import { AppError } from "@/server/http/errors";
 import { respondentHistory } from "@/server/modules/audit";
@@ -40,9 +42,19 @@ export default async function RespondentDetailPage({
       </p>
       <div className="row spread">
         <h1 style={{ margin: 0 }}>Responden {r.label}</h1>
-        <Link className="btn" href={`/admin/responden/${r.id}/ubah`}>
-          Edit
-        </Link>
+        <div className="row">
+          <Link className="btn" href={`/admin/responden/${r.id}/ubah`}>
+            Edit
+          </Link>
+          <PdfExportMenu
+            action={`/admin/responden/${r.id}/pdf`}
+            sections={RESPONDENT_SECTIONS}
+            xlsx={{
+              href: `/api/admin/respondents/${r.id}/export`,
+              label: "Ekspor Data Responden Ini (XLSX)",
+            }}
+          />
+        </div>
       </div>
 
       <div className="grid-2">

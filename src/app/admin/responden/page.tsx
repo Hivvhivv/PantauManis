@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Pagination } from "@/components/Pagination";
+import { PdfExportMenu } from "@/components/PdfExportMenu";
+import { PDF_SECTIONS, type PdfSection } from "@/lib/pdf-sections";
 import { staffForPage } from "@/server/auth/page-guards";
 import { listQuerySchema } from "@/server/modules/respondents/schemas";
 import { listRespondents } from "@/server/modules/respondents/service";
@@ -40,6 +42,14 @@ export default async function RespondentListPage({ searchParams }: { searchParam
           <Link className="btn" href="/admin/responden/cetak">
             Cetak semua kartu
           </Link>
+          <PdfExportMenu
+            action="/admin/responden/pdf"
+            sections={Object.keys(PDF_SECTIONS) as PdfSection[]}
+            xlsx={{
+              href: "/api/admin/export/semua?format=xlsx",
+              label: "Unduh XLSX (data analisis)",
+            }}
+          />
         </div>
       </div>
 

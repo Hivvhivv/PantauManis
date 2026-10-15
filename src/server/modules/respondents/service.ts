@@ -427,20 +427,6 @@ export async function getRespondentDetail(id: string) {
   };
 }
 
-/** Pilihan dropdown PDF di menu Ekspor: ID + nama lengkap (ADR-009). */
-export async function reportOptions() {
-  const rows = await prisma.respondent.findMany({
-    where: { deletedAt: null },
-    orderBy: { label: "asc" },
-    select: { id: true, label: true, fullNameEncrypted: true },
-  });
-  return rows.map((r) => ({
-    id: r.id,
-    label: r.label,
-    fullName: decryptName(r.fullNameEncrypted),
-  }));
-}
-
 /** CSV daftar kode untuk dibagikan saat rekrutmen. Dicatat di audit log. */
 export async function exportCodesCsv(actor: Actor): Promise<string> {
   const rows = await prisma.respondent.findMany({

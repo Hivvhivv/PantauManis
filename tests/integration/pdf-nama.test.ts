@@ -6,9 +6,10 @@ import { GET as exportDataset } from "@/app/api/admin/export/[dataset]/route";
 import { prisma } from "@/server/db";
 import { AuditAction, type Actor } from "@/server/modules/audit";
 import { DATASETS } from "@/server/modules/export/service";
-import { getOverallReport } from "@/server/modules/export/report";
-import { getRespondentReport } from "@/server/modules/respondents/results";
-import { getRespondentDetail, reportOptions } from "@/server/modules/respondents/service";
+import { allRespondentsPdf, respondentPdf } from "@/server/modules/export/report";
+import { loadReports } from "@/server/modules/respondents/results";
+import { getRespondentDetail } from "@/server/modules/respondents/service";
+import { parseSections, PDF_SECTIONS, type PdfSection } from "@/lib/pdf-sections";
 import { addDays } from "@/server/modules/study/days";
 import { call, makeStaff, readyRespondent, seededBeverage, staffCookie } from "../support/helpers";
 
@@ -57,8 +58,8 @@ describe("Nama lengkap responden (ADR-009)", () => {
     const f = new FormData();
     f.set("file", new File([`id_responden,nama\nR001,${NAME}\nR002,\n`], "d.csv"));
     expect((await call(importCsv, { cookie, form: f })).status).toBe(201);
-    const opts = await reportOptions();
-    expect(opts.map((o) => [o.label, o.fullName])).toEqual([
+    const people = await loadReports();
+    expect(people.map((o) => [o.label, o.fullName])).toEqual([
       ["R001", NAME],
       ["R002", null],
     ]);
@@ -97,7 +98,7 @@ describe("PDF hasil (ADR-009)", () => {
     });
     const before = await prisma.auditLog.count();
 
-    const report = await getRespondentReport(r.id, actor);
+    const report = await respondentPdf(r.id, ["ringkasan", "log"], actor);
     expect(report.fullName).toBe(NAME);
     expect(report.started).toBe(true);
 
@@ -106,11 +107,18 @@ describe("PDF hasil (ADR-009)", () => {
     expect(logs[0]).toMatchObject({
       action: AuditAction.ExportDownloaded,
       targetId: r.id,
-      metadata: { format: "pdf" },
+      metadata: { format: "pdf", sections: ["ringkasan", "log"] },
     });
   });
 
-  it("PDF keseluruhan: satu baris per responden; rata-rata gula hanya dari hari tercatat", async () => {
+  it("checkbox bagian: hanya nilai yang dikenal; kosong = semua bagian", () => {
+    const all = Object.keys(PDF_SECTIONS) as PdfSection[];
+    expect(parseSections(["log", "x", "kuesioner"], all)).toEqual(["log", "kuesioner"]);
+    expect(parseSections("keseluruhan", ["ringkasan", "log"])).toEqual(["ringkasan", "log"]);
+    expect(parseSections(undefined, all)).toEqual(all);
+  });
+
+  it("PDF semua responden: ringkasan per responden; rata-rata gula hanya dari hari tercatat", async () => {
     const { actor } = await admin();
     const r = await readyRespondent(-3, "R001"); // hari ke-1..4 berjalan
     const teh = await seededBeverage("Teh manis");
@@ -144,17 +152,21 @@ describe("PDF hasil (ADR-009)", () => {
     });
     await readyRespondent(-1, "R002");
 
-    const { rows, dashboard } = await getOverallReport(actor);
-    expect(dashboard.total).toBe(2);
-    const r1 = rows.find((x) => x.label === "R001")!;
+    const { people, overview } = await allRespondentsPdf(["keseluruhan", "log"], actor);
+    expect(people.map((p) => p.label)).toEqual(["R001", "R002"]);
+    expect(overview!.dashboard.total).toBe(2);
+    const r1 = overview!.rows.find((x) => x.label === "R001")!;
     // 30 g dibagi 2 hari tercatat (Terisi + Nol); 2 hari Belum diisi tidak ikut.
     expect(r1).toMatchObject({ recorded: 2, elapsed: 4, zeroDays: 1, avgSugarG: 15 });
-    expect(rows.find((x) => x.label === "R002")!.avgSugarG).toBeNull();
+    expect(overview!.rows.find((x) => x.label === "R002")!.avgSugarG).toBeNull();
 
     const last = await prisma.auditLog.findFirstOrThrow({ orderBy: { createdAt: "desc" } });
     expect(last).toMatchObject({
       action: AuditAction.ExportDownloaded,
-      metadata: { format: "pdf", dataset: "keseluruhan" },
+      metadata: { format: "pdf", dataset: "semua", sections: ["keseluruhan", "log"], count: 2 },
     });
+
+    // Tanpa centang "Ringkasan keseluruhan" → tidak ada agregat.
+    expect((await allRespondentsPdf(["log"], actor)).overview).toBeNull();
   });
 });

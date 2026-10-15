@@ -51,17 +51,27 @@ export async function getRespondentResults(id: string, actor: Actor) {
   return loadResults(r);
 }
 
-/** PDF hasil satu responden (ADR-009): data yang sama + nama lengkap; dicatat sebagai ekspor. */
-export async function getRespondentReport(id: string, actor: Actor) {
-  const r = await findRespondent(id);
-  await writeAudit({
-    actor,
-    action: AuditAction.ExportDownloaded,
-    targetType: "respondent",
-    targetId: id,
-    metadata: { format: "pdf" },
+/**
+ * Data PDF (ADR-009): data yang sama dengan Lihat Hasil + nama lengkap.
+ * Tanpa `id` = semua responden yang tidak dihapus, urut ID. Audit dicatat pemanggil.
+ */
+export async function loadReports(id?: string) {
+  const rows = await prisma.respondent.findMany({
+    where: { deletedAt: null, ...(id ? { id } : {}) },
+    orderBy: { label: "asc" },
   });
-  return { ...(await loadResults(r)), fullName: decryptName(r.fullNameEncrypted) };
+  if (id && rows.length === 0) throw notFound("Responden tidak ditemukan.");
+  const out = [];
+  for (const r of rows) {
+    out.push({
+      id: r.id,
+      fullName: decryptName(r.fullNameEncrypted),
+      initials: r.initials,
+      accessStatus: r.accessStatus,
+      ...(await loadResults(r)),
+    });
+  }
+  return out;
 }
 
 async function findRespondent(id: string) {
@@ -118,4 +128,4 @@ async function loadResults(r: Respondent) {
 }
 
 export type RespondentResults = Awaited<ReturnType<typeof getRespondentResults>>;
-export type RespondentReport = Awaited<ReturnType<typeof getRespondentReport>>;
+export type RespondentReport = Awaited<ReturnType<typeof loadReports>>[number];

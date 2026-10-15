@@ -3,9 +3,7 @@ import ExcelJS from "exceljs";
 import Papa from "papaparse";
 import { GET as exportDataset } from "@/app/api/admin/export/[dataset]/route";
 import { GET as exportOne } from "@/app/api/admin/respondents/[id]/export/route";
-import { GET as auditLogs } from "@/app/api/superadmin/audit-logs/route";
 import { POST as createLog } from "@/app/api/respondent/logs/route";
-import * as zero from "@/app/api/respondent/days/zero/route";
 import * as pretest from "@/app/api/respondent/pretest/route";
 import { prisma } from "@/server/db";
 import { addDays } from "@/server/modules/study/days";
@@ -225,34 +223,13 @@ describe("Ekspor data (FR-A-07)", () => {
   });
 });
 
-describe("Log Audit (FR-S-03)", () => {
-  it("khusus Superadmin, hanya-baca, dengan filter aksi dan nama yang mudah dibaca", async () => {
-    const s = await makeStaff("superadmin");
-    const cookie = await staffCookie(s.id);
-    const { cookie: adminC } = await adminCookie();
-    const r = await readyRespondent(-1, "R060");
-    await call(zero.POST, { cookie: r.cookie, body: { date: r.today } });
+describe("Log audit tetap dicatat (menu Log Audit dihapus 2026-10-15)", () => {
+  it("ekspor dicatat dengan pelaku staf", async () => {
+    const { cookie: adminC, admin } = await adminCookie();
     await csv(adminC, "responden");
-
-    expect((await call(auditLogs, { cookie: adminC })).status).toBe(403);
-    const all = await call(auditLogs, { cookie });
-    expect(all.status).toBe(200);
-    expect(all.json.total).toBeGreaterThan(0);
-
-    const exports = await call(auditLogs, {
-      cookie,
-      url: "/api/superadmin/audit-logs?action=export.downloaded",
+    const log = await prisma.auditLog.findFirstOrThrow({
+      where: { action: "export.downloaded" },
     });
-    expect(exports.json.items).toHaveLength(1);
-    expect(exports.json.items[0]).toMatchObject({
-      actionLabel: "Data responden diekspor",
-      actor: "admin uji",
-    });
-
-    const created = await call(auditLogs, {
-      cookie,
-      url: "/api/superadmin/audit-logs?action=respondent.created",
-    });
-    expect(created.json.items[0].target).toBe("Responden R060");
+    expect(log).toMatchObject({ actorType: "staff", actorId: admin.id });
   });
 });

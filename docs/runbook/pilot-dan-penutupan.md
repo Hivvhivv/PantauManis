@@ -29,12 +29,12 @@ Fase 4 PRD: uji coba (pilot) dengan 3–5 responden sebelum rekrutmen penuh.
 1. **Admin:** List Responden → Buat Kode Massal (mis. 5, awalan `P`) → Cetak Kartu.
 2. Responden mencoba di ponsel masing-masing: masuk dengan kode → persetujuan → pretest → mencatat beberapa hari (termasuk hari "tidak minum") → target → membaca edukasi.
 3. Untuk mencoba posttest tanpa menunggu 14 hari, pakai project/database uji dan ubah durasi di Pengaturan. **Jangan** mengubah durasi di database penelitian yang sedang berjalan.
-4. **Admin:** Dashboard, Perlu perhatian, Detail → Lihat Hasil Responden → Ekspor Data Responden Ini.
-5. **Ekspor → Unduh semua (XLSX)**, lalu buka di tool analisis peneliti. Periksa:
+4. **Admin:** Dashboard, Perlu perhatian, Detail → Lihat Hasil Responden → Ekspor PDF (centang bagian) → Buat PDF.
+5. **List Responden → Ekspor PDF → Unduh XLSX (data analisis)**, lalu buka di tool analisis peneliti. Periksa:
    - `ringkasan_harian` berisi 14 baris per responden, dengan status terisi/nol/belum_diisi yang benar;
    - waktu sesuai WIB;
    - kode jawaban kuesioner cocok dengan Codebook.
-6. Superadmin memeriksa **Log Audit**: login, Lihat Hasil, dan ekspor tercatat.
+6. Periksa **riwayat tindakan** di Detail Responden: Lihat Hasil dan ekspor PDF tercatat. Log lengkap (tabel `audit_logs`) diperiksa pengembang di Supabase bila perlu.
 7. Catat masukan responden (kejelasan teks, waktu mencatat < 1 menit, tampilan ponsel).
 
 **Setelah pilot:** responden pilot dinonaktifkan atau dihapus (lunak) agar tidak ikut analisis. Setiap perbaikan dikerjakan sebagai perubahan biasa (rencana → test → deploy).
@@ -43,7 +43,7 @@ Fase 4 PRD: uji coba (pilot) dengan 3–5 responden sebelum rekrutmen penuh.
 
 - Pantau **Dashboard → Perlu perhatian** setiap hari.
 - Kode bocor atau lupa: **Reset Kode**. Data responden tetap utuh.
-- Banner peringatan keamanan muncul: periksa Log Audit, lalu reset kode responden yang terdampak bila perlu (ADR-003, ADR-004).
+- Banner peringatan keamanan muncul: minta pengembang memeriksa tabel `audit_logs`, lalu reset kode responden yang terdampak bila perlu (ADR-003, ADR-004).
 - Ekspor berkala sebagai cadangan analisis. Setiap ekspor tercatat di log audit.
 
 ## 4. Penutupan dan hapus permanen (BR-11)

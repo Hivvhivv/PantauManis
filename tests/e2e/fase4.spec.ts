@@ -10,7 +10,7 @@ async function staffLogin(page: Page, email: string) {
   await expect(page).toHaveURL(/\/admin$/);
 }
 
-test("alur Admin (PRD 13): buat kode → detail → lihat hasil → ekspor → log audit", async ({
+test("alur Admin (PRD 13): buat kode → detail → lihat hasil → ekspor", async ({
   page,
   browser,
 }, info) => {
@@ -42,46 +42,37 @@ test("alur Admin (PRD 13): buat kode → detail → lihat hasil → ekspor → l
   });
   await ctx.close();
 
-  // Detail → Lihat hasil → Ekspor responden ini
+  // Detail → Lihat hasil → Ekspor responden ini (XLSX, di menu Ekspor PDF)
   await page.getByRole("link", { name: "Kembali ke List Responden" }).click();
   await page.getByRole("link", { name: label, exact: true }).click();
   await page.getByRole("button", { name: "Lihat Hasil Responden" }).click();
   await expect(page.getByRole("heading", { name: `Hasil responden ${label}` })).toBeVisible();
+  await page.getByText("Ekspor PDF").click();
   const one = page.waitForEvent("download");
-  await page.getByRole("link", { name: "Ekspor Data Responden Ini" }).click();
+  await page.getByRole("link", { name: "Ekspor Data Responden Ini (XLSX)" }).click();
   expect((await one).suggestedFilename()).toMatch(new RegExp(`^pantaumanis-${label}-.*\\.xlsx$`));
 
-  // Ekspor ringkasan harian (CSV)
-  await page.getByRole("link", { name: "Ekspor Data", exact: true }).click();
-  // Klik tautan memicu unduhan dengan nama file yang benar. Isi file diperiksa lewat request
-  // dengan sesi yang sama: di mesin pengembang ini Chromium membatalkan semua unduhan ke disk
-  // (termasuk data: URL), jadi file unduhan tidak bisa dibaca langsung.
-  const dl = page.waitForEvent("download");
-  const csvLink = page
-    .locator("li", { hasText: "Ringkasan harian" })
-    .getByRole("link", { name: "CSV" });
-  await csvLink.click();
-  expect((await dl).suggestedFilename()).toMatch(/^pantaumanis-ringkasan_harian-.*\.csv$/);
-  const res = await page.request.get((await csvLink.getAttribute("href"))!);
+  // List Responden → Ekspor PDF → XLSX data analisis
+  await page.getByRole("link", { name: "List Responden" }).first().click();
+  await page.getByText("Ekspor PDF").click();
+  const all = page.waitForEvent("download");
+  await page.getByRole("link", { name: "Unduh XLSX (data analisis)" }).click();
+  expect((await all).suggestedFilename()).toMatch(/^pantaumanis-semua-.*\.xlsx$/);
+
+  // Isi CSV ringkasan harian diperiksa lewat request dengan sesi yang sama: di mesin pengembang
+  // ini Chromium membatalkan semua unduhan ke disk, jadi file unduhan tidak bisa dibaca langsung.
+  const res = await page.request.get("/api/admin/export/ringkasan_harian?format=csv");
   expect(res.headers()["content-disposition"]).toContain("attachment");
   const text = await res.text();
   expect(text).toContain("id_responden,hari_ke,tanggal,status,jumlah_minuman,perkiraan_gula_g");
   expect(text).toMatch(new RegExp(`${label},1,\\d{4}-\\d{2}-\\d{2},nol,0,0`));
   expect(text).not.toContain(code.replace(/\D/g, ""));
-
-  // Superadmin melihat jejaknya di Log Audit
-  await page.context().clearCookies();
-  await staffLogin(page, "super@e2e.id");
-  await page.getByRole("link", { name: "Log Audit" }).click();
-  await page.getByLabel("Aksi").selectOption("export.downloaded");
-  await page.getByRole("button", { name: "Terapkan" }).click();
-  await expect(page.getByRole("cell", { name: /Data responden diekspor/ }).first()).toBeVisible();
-  await expect(page.getByRole("cell", { name: "Admin E2E" }).first()).toBeVisible();
 });
 
-test("Admin tidak bisa membuka Log Audit", async ({ page }, info) => {
+test("menu Ekspor Data dan Log Audit sudah tidak ada", async ({ page }, info) => {
   test.skip(info.project.name !== "desktop", "Alur staf diuji di desktop");
-  await staffLogin(page, "admin@e2e.id");
+  await staffLogin(page, "super@e2e.id");
+  await expect(page.getByRole("link", { name: "Ekspor Data", exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Log Audit" })).toHaveCount(0);
-  expect((await page.goto("/admin/log-audit"))?.status()).toBe(403);
+  expect((await page.goto("/admin/log-audit"))?.status()).toBe(404);
 });

@@ -1,70 +1,68 @@
 import "server-only";
-import { prisma } from "@/server/db";
+import type { PdfSection } from "@/lib/pdf-sections";
 import { AuditAction, writeAudit, type Actor } from "@/server/modules/audit";
 import { getAdminDashboard } from "@/server/modules/admin-dashboard/service";
-import { decryptName } from "@/server/modules/respondents/service";
-import { getStudySettings } from "@/server/modules/study/settings";
-import { buildTables } from "./service";
+import { loadReports, type RespondentReport } from "@/server/modules/respondents/results";
+import { classifyStatus, STATUS_LABELS } from "@/server/modules/study/aggregate";
 
-const STATUS_TEXT: Record<string, string> = {
-  belum_mulai: "Belum mulai",
-  aktif: "Aktif",
-  selesai: "Selesai",
-  nonaktif: "Nonaktif",
-};
-
-const num = (v: unknown) => (typeof v === "number" ? v : null);
-
-/**
- * PDF hasil keseluruhan (ADR-009): agregat Dashboard Admin + satu baris ringkas per responden
- * (dengan nama lengkap). Dicatat di log audit sebagai ekspor.
- */
-export async function getOverallReport(actor: Actor, now = new Date()) {
-  const settings = await getStudySettings();
-  const [dashboard, [table], people, sugar, responses] = await Promise.all([
-    getAdminDashboard({ status: "all" }, now),
-    buildTables(["responden"], {}, now),
-    prisma.respondent.findMany({
-      where: { deletedAt: null },
-      select: { id: true, label: true, fullNameEncrypted: true },
-    }),
-    prisma.consumptionLog.groupBy({
-      by: ["respondentId"],
-      where: { deletedAt: null, studyDay: { lte: settings.durationDays } },
-      _sum: { sugarGSnapshot: true },
-    }),
-    prisma.questionnaireResponse.findMany({
-      where: { status: "submitted" },
-      select: { respondentId: true, score: true, questionnaire: { select: { type: true } } },
-    }),
-  ]);
+/** PDF satu responden (Detail Responden). Dicatat di log audit sebagai ekspor. */
+export async function respondentPdf(id: string, sections: PdfSection[], actor: Actor) {
+  const [person] = await loadReports(id);
   await writeAudit({
     actor,
     action: AuditAction.ExportDownloaded,
-    metadata: { format: "pdf", dataset: "keseluruhan", count: people.length },
+    targetType: "respondent",
+    targetId: id,
+    metadata: { format: "pdf", sections },
   });
+  return person!;
+}
 
-  const byLabel = new Map(people.map((p) => [p.label, p]));
-  const sugarBy = new Map(sugar.map((s) => [s.respondentId, s._sum.sugarGSnapshot ?? 0]));
-  const score = (id: string, type: "pretest" | "posttest") =>
-    responses.find((r) => r.respondentId === id && r.questionnaire.type === type)?.score ?? null;
-
-  const rows = table!.rows.map((row) => {
-    const p = byLabel.get(String(row.id_responden))!;
-    const recorded = num(row.hari_tercatat);
-    return {
-      label: p.label,
-      fullName: decryptName(p.fullNameEncrypted),
-      status: STATUS_TEXT[String(row.status_penelitian)] ?? "—",
-      recorded,
-      elapsed: num(row.hari_berjalan),
-      zeroDays: num(row.hari_nol),
-      // Rata-rata per hari tercatat (Terisi + Nol); hari Belum diisi tidak ikut.
-      avgSugarG: recorded ? Math.round(((sugarBy.get(p.id) ?? 0) / recorded) * 10) / 10 : null,
-      pretestScore: score(p.id, "pretest"),
-      posttestScore: score(p.id, "posttest"),
-    };
+/** PDF semua responden (List Responden): satu bagian per responden, opsional ringkasan agregat. */
+export async function allRespondentsPdf(sections: PdfSection[], actor: Actor) {
+  const people = await loadReports();
+  const overview = sections.includes("keseluruhan")
+    ? { dashboard: await getAdminDashboard({ status: "all" }), rows: people.map(overviewRow) }
+    : null;
+  await writeAudit({
+    actor,
+    action: AuditAction.ExportDownloaded,
+    metadata: { format: "pdf", dataset: "semua", sections, count: people.length },
   });
+  return { people, overview };
+}
 
-  return { dashboard, rows };
+/** Satu baris tabel ringkasan per responden. Hari Belum diisi tidak ikut rata-rata (BR-02). */
+export function overviewRow(p: RespondentReport) {
+  const submitted = (q: RespondentReport["pretest"]) => (q?.status === "submitted" ? q : null);
+  const status =
+    STATUS_LABELS[
+      classifyStatus({
+        accessStatus: p.accessStatus,
+        dayOne: p.started ? p.dayOne : null,
+        posttestSubmitted: !!submitted(p.posttest),
+      })
+    ];
+  const base = {
+    label: p.label,
+    fullName: p.fullName,
+    status,
+    pretestScore: submitted(p.pretest)?.score ?? null,
+    posttestScore: submitted(p.posttest)?.score ?? null,
+  };
+  if (!p.started) {
+    return { ...base, recorded: null, elapsed: null, zeroDays: null, avgSugarG: null };
+  }
+  const d = p.dashboard;
+  const recorded = d.completeness.filled;
+  const sugar = p.logs
+    .filter((l) => l.studyDay <= d.durationDays)
+    .reduce((s, l) => s + l.sugarG, 0);
+  return {
+    ...base,
+    recorded,
+    elapsed: d.completeness.elapsed,
+    zeroDays: d.calendar.filter((c) => c.state === "zero").length,
+    avgSugarG: recorded ? Math.round((sugar / recorded) * 10) / 10 : null,
+  };
 }
