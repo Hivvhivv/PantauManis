@@ -39,12 +39,15 @@ async function respondentForPage() {
 /**
  * Halaman responden per tahap: persetujuan → pretest → siap (BR-06).
  * Responden yang membuka halaman tahap lain diarahkan ke tahapnya sendiri.
+ * "home" (Beranda) terbuka untuk semua yang sudah setuju; sebelum pretest, Beranda
+ * menampilkan tombol Isi Pretest dan fitur lain tetap terkunci.
  */
-export async function respondentAtStage(stage: "consent" | "pretest"): Promise<Respondent>;
+export async function respondentAtStage(stage: "consent" | "pretest" | "home"): Promise<Respondent>;
 export async function respondentAtStage(stage: "ready"): Promise<ReadyRespondent>;
-export async function respondentAtStage(stage: "consent" | "pretest" | "ready") {
+export async function respondentAtStage(stage: "consent" | "pretest" | "home" | "ready") {
   const r = await respondentForPage();
   const current = !r.consentAt ? "consent" : !r.dayOneDate ? "pretest" : "ready";
-  if (current !== stage) redirect(respondentHomePath(r));
+  const allowed = stage === "home" ? current !== "consent" : current === stage;
+  if (!allowed) redirect(respondentHomePath(r));
   return r;
 }

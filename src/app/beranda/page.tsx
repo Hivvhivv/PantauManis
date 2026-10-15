@@ -5,11 +5,14 @@ import { DayStatusBadge } from "@/components/DayStatusBadge";
 import { Disclaimer } from "@/components/Disclaimer";
 import { DrinksIllustration } from "@/components/DrinksIllustration";
 import { Icon } from "@/components/Icon";
+import { InstallCard } from "@/components/InstallCard";
 import { RespondentShell } from "@/components/RespondentShell";
 import { ZeroDayButton } from "@/components/ZeroDayButton";
 import { formatLocalDate } from "@/lib/format";
 import { categoryColor } from "@/lib/palette";
+import type { ReadyRespondent } from "@/server/auth/guards";
 import { respondentAtStage } from "@/server/auth/page-guards";
+import { PretestGate } from "./PretestGate";
 import { getDashboard } from "@/server/modules/consumption/dashboard";
 import { getGoalState } from "@/server/modules/goals/service";
 import { posttestInfo } from "@/server/modules/questionnaires/service";
@@ -72,7 +75,9 @@ export default async function BerandaPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const r = await respondentAtStage("ready");
+  const resp = await respondentAtStage("home");
+  if (!resp.dayOneDate) return <PretestGate id={resp.id} label={resp.label} />;
+  const r = resp as ReadyRespondent;
   const sp = await searchParams;
   const range: RangeKey =
     typeof sp.range === "string" && sp.range in RANGES ? (sp.range as RangeKey) : "2w";
@@ -109,6 +114,8 @@ export default async function BerandaPage({
           🎉 Catatanmu tersimpan. Terima kasih sudah mencatat!
         </p>
       )}
+
+      <InstallCard />
 
       {pt.state === "open" && (
         <Link className="reminder" href="/posttest">

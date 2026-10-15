@@ -28,6 +28,13 @@ Sebelum pilot, peneliti wajib mengganti tiga hal yang masih berupa **CONTOH**: b
 
 Lihat ADR-009.
 
+**Tambahan 2026-10-15 (2):**
+
+- Menu **Kuesioner**: staf membuat soal pretest/posttest (skala 1–5, pilihan ganda, isian; satu set untuk keduanya; terkunci setelah ada jawaban). Lihat ADR-010.
+- Pretest dibuka lewat tombol di Beranda.
+- Halaman Edukasi didesain ulang.
+- PantauManis bisa dipasang di layar HP (PWA).
+
 Langkah selanjutnya: jalankan pilot 3–5 responden mengikuti runbook di atas.
 
 ## Menjalankan secara lokal

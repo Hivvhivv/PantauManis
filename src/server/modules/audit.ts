@@ -37,6 +37,7 @@ export const AuditAction = {
   MaterialDeleted: "education.deleted",
   MaterialsReordered: "education.reordered",
   ExportDownloaded: "export.downloaded",
+  QuestionnaireUpdated: "questionnaire.updated",
 } as const;
 
 type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];

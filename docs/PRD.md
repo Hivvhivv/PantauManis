@@ -147,6 +147,7 @@ Responden memiliki delapan halaman utama: Persetujuan, Pretest, Dashboard, Catat
 FR-R-01 Persetujuan dan pretest
 • Saat login pertama, Responden membaca lembar informasi penelitian dan mencentang persetujuan (informed consent).
 • Pretest wajib diisi sebelum fitur lain terbuka. Jawaban dapat disimpan sebagai draf dan dilanjutkan.
+• Keputusan 2026-10-15 (ADR-010): setelah persetujuan, responden masuk Beranda yang menampilkan tombol "Isi Kuesioner Awal" (atau "Lanjutkan" bila ada draf); fitur lain tetap terkunci sampai pretest dikirim.
 • Setelah dikirim, pretest terkunci dan tidak bisa diubah Responden. Hari ke-1 periode dimulai pada tanggal pretest selesai.
 FR-R-02 Pencatatan konsumsi minuman
 • Form berisi: jenis minuman (dropdown: teh manis, kopi susu, boba/milk tea, minuman bersoda, jus kemasan, minuman energi, susu berperisa, lainnya), ukuran (pilihan gelas/botol atau ml), jumlah sajian, tingkat gula (normal/less/no sugar bila relevan), waktu minum, dan catatan opsional.
@@ -179,7 +180,7 @@ FR-R-07 Posttest
 • Setelah posttest terkirim, Responden melihat halaman terima kasih dan ringkasan progres; akses pencatatan dapat dikunci.
 • Keputusan: posttest terbuka hari ke-[durasi] sampai hari ke-[durasi + masa tenggang] (default 14–17). Pencatatan tidak dikunci setelah posttest. Beranda menampilkan pengingat saat posttest terbuka.
 6. Kebutuhan Fungsional — Admin
-Admin memiliki empat menu: Dashboard, List Responden, Materi Edukasi, dan Referensi Minuman. (Menu Ekspor Data dihapus 2026-10-15; ekspor ada di tombol "Ekspor PDF" List/Detail Responden, ADR-009.)
+Admin memiliki lima menu: Dashboard, List Responden, Referensi Minuman, Materi Edukasi, dan Kuesioner (soal pretest/posttest, ADR-010). (Menu Ekspor Data dihapus 2026-10-15; ekspor ada di tombol "Ekspor PDF" List/Detail Responden, ADR-009.)
 FR-A-01 Dashboard agregat
 Menampilkan data gabungan seluruh responden (tanpa identitas per orang) dengan filter rentang tanggal dan status:
 • Kartu ringkasan: total responden, jumlah per status (Belum mulai, Aktif, Selesai, Nonaktif), rata-rata kelengkapan pencatatan, persentase pretest dan posttest selesai.
@@ -431,6 +432,7 @@ Daftar ADR yang perlu dibuat
 7. ADR-007 Format dan skema ekspor data penelitian.
 8. ADR-008 Penyimpanan media edukasi.
 9. ADR-009 Nama lengkap responden dan laporan PDF.
+10. ADR-010 Soal pretest/posttest dikelola staf; pretest lewat tombol di Beranda.
 13. Pengujian dan Definition of Done
 Setiap fitur diuji di tiga tingkat dan wajib lulus skenario kontrol akses sebelum dinyatakan selesai.
 Lapisan pengujian
@@ -496,7 +498,7 @@ Pertanyaan terbuka
 [x] Apakah kode akses perlu tetap terlihat di List Responden? Ya, disimpan terenkripsi (ADR-004).
 [x] Apakah setiap Admin melihat semua responden? Ya, semua responden.
 [x] Apakah kode akses kedaluwarsa setelah periode penelitian? Tidak; Responden tetap dapat mengakses.
-[ ] Instrumen pretest dan posttest apa yang dipakai (jumlah butir, skala, cara skor)? — Mesin kuesioner sudah ada (Fase 2) dengan butir CONTOH; butir final dimasukkan lewat migration setelah instrumen disetujui.
+[ ] Instrumen pretest dan posttest apa yang dipakai (jumlah butir, skala, cara skor)? — Mesin kuesioner sudah ada (Fase 2) dengan butir CONTOH. Sejak 2026-10-15 (ADR-010) butir final diisi staf lewat menu Kuesioner (skala 1–5, pilihan ganda, isian; satu set untuk pretest & posttest), sebelum responden pertama mengisi.
 [ ] Sumber nilai gula per jenis minuman untuk tabel referensi. — Menu Admin "Referensi Minuman" sudah ada (Fase 2); 8 jenis awal masih nilai CONTOH bertanda "perlu diverifikasi".
 [x] Apakah pencatatan dikunci setelah posttest? Tidak: responden tetap bisa mencatat setelah hari ke-14; catatan ditandai di luar periode.
 [ ] Teks resmi lembar informasi/persetujuan yang disetujui komite etik (saat ini teks CONTOH di study_settings.consent_text).

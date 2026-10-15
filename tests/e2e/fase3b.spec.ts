@@ -69,7 +69,11 @@ test("Admin membuat materi + kuis; responden membaca dan mengerjakan kuis", asyn
   const resp = await ctx.newPage();
   await readyRespondent(request, resp);
   await resp.goto("/edukasi");
-  await resp.getByRole("link", { name: new RegExp(title) }).click();
+  // Judul muncul di kartu "Mulai dari sini" dan di grid; keduanya menuju materi yang sama.
+  await resp
+    .getByRole("link", { name: new RegExp(title) })
+    .first()
+    .click();
   await expect(resp.getByRole("heading", { level: 1 })).toHaveText(title);
   await expect(resp.getByRole("img", { name: "Infografis gula tambahan" })).toBeVisible();
   await expect(resp.getByText(/bukan alat diagnosis diabetes/)).toBeVisible();

@@ -93,7 +93,7 @@ export function QuestionnaireForm({
               ) : (
                 <fieldset aria-invalid={err ? true : undefined}>
                   <legend>{title}</legend>
-                  <div className="options">
+                  <div className={q.type === "likert" ? "options likert" : "options"}>
                     {q.options?.map((o) => (
                       <label key={o.value} className="option">
                         <input
@@ -103,7 +103,12 @@ export function QuestionnaireForm({
                           checked={answers[q.id] === o.value}
                           onChange={() => set(q.id, o.value)}
                         />
-                        {o.label}
+                        {q.type === "likert" && (
+                          <span className="likert-num" aria-hidden="true">
+                            {o.value}
+                          </span>
+                        )}
+                        <span>{o.label}</span>
                       </label>
                     ))}
                   </div>
