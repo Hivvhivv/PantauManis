@@ -1,0 +1,101 @@
+f40cee7 Fase 4: ekspor data penelitian, Log Audit, runbook pilot
+- Ekspor (Admin/Superadmin): responden, log konsumsi, ringkasan harian (14 baris
+  per responden, Terisi/Nol/Belum diisi; kosong bukan 0), kuesioner (kode angka),
+  target, edukasi; CSV berkoma UTF-8 + XLSX semua dataset dengan Codebook;
+  waktu ISO 8601 WIB; tanpa kode akses; responden terhapus tidak ikut (ADR-007)
+- "Ekspor Data Responden Ini" di panel Lihat Hasil
+- Setiap ekspor dicatat di audit log
+- Log Audit (Superadmin): hanya-baca, filter aksi/pelaku/tanggal, nama mudah dibaca
+- Runbook pilot & penutupan penelitian (termasuk prosedur hapus permanen BR-11)
+- Test: unit, integration (AC-12, privasi, hak akses), e2e alur Admin lengkap
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+c479f5c Redesign Riwayat: filter rentang cepat, grup per hari yang bisa dilipat
+- Rentang Semua/7 hari/2 minggu/1 bulan/3 bulan/1 tahun, tanggal, jenis minuman, urutan terbaru/terlama
+- Grup per hari dengan total perkiraan gula dan jumlah minuman; hari Nol dan Belum diisi tetap ditandai (BR-02)
+- Tombol titik tiga langsung ke ubah catatan dalam jendela susulan
+- Kutipan sapaan tidak lagi menimpa ilustrasi; tata letak 360 px dirapikan
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+cac3bfd Fase 3b: Materi Edukasi (CMS admin, unggah gambar, kuis, halaman responden)
+- Migration 11: education_materials, education_quiz_questions, education_progress
+- Admin: menu Materi Edukasi; Markdown + pratinjau, unggah gambar (JPG/PNG/WebP
+  maks. 5 MB, dicek dari isi file), video YouTube, jadwal hari ke-N, Draf/Terbit,
+  kuis 0-3 soal; urutan drag-and-drop + tombol naik/turun
+- Penyimpanan media: driver lokal (dev/test) dan Supabase Storage via REST API
+  dengan service role key di server (ADR-008)
+- Responden: menu Edukasi, materi terkunci per hari, halaman baca dengan
+  disclaimer, kuis boleh diulang (skor pertama & terakhir disimpan)
+- Lihat Hasil Responden: tabel aktivitas edukasi
+- Test: unit, integration (draf/terkunci tak bisa dibuka, validasi unggahan,
+  path traversal), e2e alur admin -> responden
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+55f055b Prisma dev: buat ulang client yang di-cache bila model baru belum dikenal
+Setelah migration + prisma generate, client di globalThis dari sesi dev sebelumnya tidak punya delegate model baru (mis. prisma.goal undefined). Deteksi lewat Prisma.ModelName lalu buat client baru.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+8190ef3 Fase 3a: target & umpan balik, posttest, Dashboard Admin, Lihat Hasil, Pengaturan
+- Migration 10: goals (satu target aktif, ubah maks. sekali per minggu, riwayat)
+- Responden: halaman Target + umpan balik mingguan positif (tanpa kata risiko/
+  diagnosis, diuji); garis target di grafik; kartu target dan pengingat posttest
+- Posttest: terbuka hari ke-14 s.d. ke-17, terkunci setelah dikirim, halaman
+  terima kasih + ringkasan; pencatatan tetap dibuka
+- Admin: Dashboard agregat (status, kelengkapan, rata-rata per hari ke- dengan n,
+  komposisi, corong, perlu perhatian)
+- Detail Responden: "Lihat Hasil Responden" dimuat saat diklik, setiap pembukaan
+  dicatat di audit (ADR-006, AC-04/AC-05)
+- Superadmin: Pengaturan Penelitian (durasi, tenggang, susulan, faktor gula,
+  teks persetujuan)
+- Test: unit + integration + e2e (termasuk pemeriksaan request jaringan AC-04)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+34dee3d Redesign Catat Minuman: dua langkah, pencarian, minuman favorit
+- Tata letak lebar penuh: "1 Pilih jenis minuman" dan "2 Isi detail minuman"
+- Pencarian jenis minuman; minuman favorit (4 jenis tersering milik responden)
+- Kartu perkiraan gula per porsi, total, dan setara sendok teh (tetap dihitung
+  dari tabel referensi, tidak bisa diisi manual)
+- Waktu minum dipisah: pilihan tanggal (hari ini s.d. batas susulan) + jam
+- Kartu "tidak minum hari ini" disembunyikan bila hari ini sudah tercatat
+- Ponsel: urutan pilih jenis -> isi detail -> perkiraan gula
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+edb3122 Supabase production config dan redesign Beranda lebar penuh
+- prisma.config.ts: migration memakai DIRECT_URL, runtime DATABASE_URL (pooler);
+  pengaman menolak migration lewat pooler mode transaksi
+- Skrip :prod (db:status, db:deploy, superadmin:create/reset) membaca .env.supabase
+  tanpa menyentuh .env lokal; runbook docs/runbook/deploy-supabase.md
+- ADR-002: Supabase sebagai PostgreSQL production, catatan SSL dan region
+- Beranda: tata letak lebar penuh (sapaan, ringkasan 3 kartu, grafik + komposisi,
+  kalender mingguan + aktivitas terbaru), ikon garis, chip akun di header
+- Prettier mengabaikan folder alat pihak ketiga (.agents, .aider-desk)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+20f163b Fase 2: inti responden (persetujuan, pretest, pencatatan, dashboard, riwayat)
+- Migration 6-9: referensi minuman, catatan konsumsi + status harian,
+  mesin kuesioner (butir CONTOH), pengaturan faktor gula & teks persetujuan
+- Alur responden: persetujuan -> pretest (draf otomatis, terkunci) -> beranda
+- Catat minuman dan "tidak minum hari ini"; Belum diisi != Nol (ADR-005)
+- Dashboard: grafik 1 minggu/2 minggu/1 bulan/1 tahun, kalender 14 hari
+- Riwayat dengan filter; edit/hapus dalam jendela susulan
+- Admin: menu Referensi Minuman; kolom & filter progres di List Responden
+- Postgres lokal dipaksa UTF-8; e2e memakai build produksi
+- Test: unit, integration (AC-07, AC-11, BR-02..BR-07), e2e 360 px & desktop
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+efd86ad UI responden lebih ramah dengan palet hangat; tautan balik dari login staf
+- Palet krem/karamel/sage dan font Nunito, termasuk mode gelap
+- Halaman masuk responden dan staf dua kolom dengan ilustrasi
+- Halaman /mulai: sapaan, langkah penelitian, kartu tips
+- Login staf: tautan kembali ke halaman masuk responden (+ test e2e)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
