@@ -2,7 +2,7 @@ import { z } from "zod";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/server/auth/password";
 import { respondentInputSchema } from "@/server/modules/respondents/schemas";
 
-export const passwordSchema = z
+const passwordSchema = z
   .string({ error: "Kata sandi wajib diisi." })
   .min(PASSWORD_MIN, `Kata sandi minimal ${PASSWORD_MIN} karakter.`)
   .max(PASSWORD_MAX, `Kata sandi maksimal ${PASSWORD_MAX} karakter.`);

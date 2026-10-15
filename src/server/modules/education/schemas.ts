@@ -4,7 +4,7 @@ import { youtubeId } from "./rules";
 
 const emptyToNull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : v);
 
-export const quizQuestionSchema = z
+const quizQuestionSchema = z
   .object({
     text: z.string().trim().min(1, "Pertanyaan wajib diisi.").max(500),
     options: z

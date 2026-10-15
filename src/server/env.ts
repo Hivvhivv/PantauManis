@@ -25,7 +25,7 @@ const schema = z
     message: "ACCESS_CODE_HMAC_SECRET dan ACCESS_CODE_ENC_KEY harus berbeda",
   });
 
-export type Env = z.infer<typeof schema>;
+type Env = z.infer<typeof schema>;
 
 let cached: Env | undefined;
 

@@ -25,7 +25,7 @@ export const settingsSchema = z.object({
     .min(20, "Teks persetujuan terlalu pendek.")
     .max(20000, "Maksimal 20.000 karakter."),
 });
-export type SettingsInput = z.infer<typeof settingsSchema>;
+type SettingsInput = z.infer<typeof settingsSchema>;
 
 const KEYS: Record<keyof SettingsInput, string> = {
   durationDays: "study_duration_days",

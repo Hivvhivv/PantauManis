@@ -1,7 +1,7 @@
 /** Estimasi gula (gram) dari tabel referensi. Selalu ditampilkan sebagai "perkiraan". Modul murni. */
 export type SugarLevel = "normal" | "less" | "none";
 
-export type SugarFactors = { less: number; none: number };
+type SugarFactors = { less: number; none: number };
 
 export function estimateSugarG(input: {
   sugarGPerServing: number;

@@ -4,7 +4,7 @@
  */
 import { addDays, studyDayOf } from "./days";
 
-export type PosttestState = "not_yet" | "open" | "closed" | "submitted";
+type PosttestState = "not_yet" | "open" | "closed" | "submitted";
 
 export function posttestWindow(dayOne: string, durationDays: number, graceDays: number) {
   return {

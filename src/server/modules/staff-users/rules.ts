@@ -4,10 +4,10 @@
  */
 import type { StaffRole } from "@/generated/prisma/client";
 
-export type StaffTarget = { id: string; role: StaffRole; isActive: boolean };
+type StaffTarget = { id: string; role: StaffRole; isActive: boolean };
 export type StaffChange = { role?: StaffRole; isActive?: boolean; delete?: boolean };
 
-export type RuleViolation = { code: string; message: string } | null;
+type RuleViolation = { code: string; message: string } | null;
 
 export function checkStaffChange(params: {
   actorId: string;

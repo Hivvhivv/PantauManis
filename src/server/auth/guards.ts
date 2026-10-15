@@ -6,7 +6,7 @@ import { clientIp } from "@/server/http/route";
 import type { Actor } from "@/server/modules/audit";
 import { resolveRespondentSession, resolveStaffSession } from "./sessions";
 
-export type StaffContext = { user: StaffUser; actor: Actor };
+type StaffContext = { user: StaffUser; actor: Actor };
 
 /**
  * Pemeriksaan peran di server untuk setiap endpoint staf (ADR-001, ADR-003).

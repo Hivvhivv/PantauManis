@@ -9,7 +9,7 @@ import { CONTENT_TYPES, isMediaKey } from "./media";
  * - "supabase": Supabase Storage lewat REST API, bucket publik, service role key hanya di server.
  * - "local" (default dev/test): folder lokal, disajikan oleh GET /api/media/[...key].
  */
-export interface MediaStorage {
+interface MediaStorage {
   put(key: string, bytes: Uint8Array, contentType: string): Promise<void>;
   remove(key: string): Promise<void>;
   publicUrl(key: string): string;
@@ -19,7 +19,7 @@ function assertKey(key: string) {
   if (!isMediaKey(key)) throw new Error("Kunci media tidak valid");
 }
 
-export function localDir(): string {
+function localDir(): string {
   return (
     process.env.PM_UPLOAD_DIR ??
     path.join(

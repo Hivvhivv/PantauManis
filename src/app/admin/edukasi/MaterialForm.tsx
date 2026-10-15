@@ -9,7 +9,7 @@ import { Markdown } from "@/components/Markdown";
 
 type Question = { text: string; options: string[]; correctIndex: number };
 
-export type MaterialDefaults = {
+type MaterialDefaults = {
   id?: string;
   title: string;
   summary: string;

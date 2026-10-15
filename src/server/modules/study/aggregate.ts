@@ -24,7 +24,7 @@ export function classifyStatus(r: {
   return "active";
 }
 
-export type DayAgg = { studyDay: number; n: number; avgSugarG: number; avgDrinks: number };
+type DayAgg = { studyDay: number; n: number; avgSugarG: number; avgDrinks: number };
 
 /**
  * Rata-rata per hari ke-1..durasi, hanya dari responden yang mencatat (Terisi/Nol) hari itu.
@@ -64,7 +64,7 @@ export function perStudyDay(params: {
   });
 }
 
-export type AttentionReason = "two_days_empty" | "posttest_missing";
+type AttentionReason = "two_days_empty" | "posttest_missing";
 
 export const ATTENTION_LABELS: Record<AttentionReason, string> = {
   two_days_empty: "Belum mengisi 2 hari berturut-turut",

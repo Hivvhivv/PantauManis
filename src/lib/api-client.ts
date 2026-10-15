@@ -1,6 +1,6 @@
 /** Pemanggil API sisi browser dengan format error seragam. */
 export type ApiError = { code: string; message: string; fields: Record<string, string> };
-export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: ApiError; status: number };
+type ApiResult<T> = { ok: true; data: T } | { ok: false; error: ApiError; status: number };
 
 export async function api<T = unknown>(
   url: string,

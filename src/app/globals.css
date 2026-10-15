@@ -498,44 +498,6 @@ dl.meta dd {
   margin: 0;
   font-size: 1.6rem;
 }
-.steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.75rem;
-}
-.steps li {
-  display: grid;
-  grid-template-columns: 2.25rem 1fr;
-  gap: 0.25rem 0.75rem;
-  align-items: center;
-}
-.steps .pill {
-  grid-column: 2;
-  justify-self: start;
-}
-@media (min-width: 520px) {
-  .steps li {
-    grid-template-columns: 2.25rem 1fr auto;
-  }
-  .steps .pill {
-    grid-column: auto;
-  }
-}
-.step-num {
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-.step-title {
-  font-weight: 700;
-}
 .pill {
   display: inline-block;
   padding: 0.15rem 0.6rem;
@@ -620,11 +582,6 @@ dl.meta dd {
 }
 
 /* Kartu statistik */
-.stats {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(2, 1fr);
-}
 .stat {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -825,6 +782,7 @@ dl.meta dd {
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text);
+  text-decoration: none;
   cursor: pointer;
 }
 .chip[aria-pressed="true"] {
@@ -874,26 +832,6 @@ legend {
   font-weight: 700;
   margin-bottom: 0.35rem;
   padding: 0;
-}
-
-/* Riwayat */
-.day-card .day-head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem;
-  align-items: center;
-}
-.log-item {
-  display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  gap: 0.6rem;
-  align-items: center;
-  padding: 0.6rem 0;
-  border-top: 1px solid var(--border);
-}
-.log-item .emoji {
-  font-size: 1.4rem;
 }
 
 /* Kuesioner */
@@ -994,9 +932,6 @@ legend {
 }
 .icon {
   flex-shrink: 0;
-}
-.resp-nav a {
-  align-items: center;
 }
 .account {
   display: flex;
@@ -1624,6 +1559,7 @@ legend {
 }
 .goal-days .no {
   background: var(--primary-soft);
+  border-color: var(--primary);
   color: var(--primary-hover);
 }
 .goal-days .none {
@@ -1673,9 +1609,6 @@ legend {
 .legend .l-over::before {
   background: var(--primary-soft);
   border: 1px solid var(--primary);
-}
-.goal-days .no {
-  border-color: var(--primary);
 }
 
 /* ---------- Edukasi ---------- */
@@ -1866,9 +1799,6 @@ legend {
   gap: 0.75rem 1.25rem;
   align-items: center;
 }
-.chip {
-  text-decoration: none;
-}
 .chip-on,
 .chip-on:hover {
   background: var(--primary);
@@ -1908,6 +1838,7 @@ legend {
 .day-group .day-meta {
   grid-column: 2 / 3;
   color: var(--muted);
+  white-space: nowrap;
 }
 .day-group .chev {
   grid-row: 1;
@@ -1967,9 +1898,6 @@ legend {
   display: grid;
   gap: 0.6rem;
   padding: 0.85rem 1rem;
-}
-.day-group .day-meta {
-  white-space: nowrap;
 }
 /* Kutipan di atas ilustrasi, tidak menimpanya. */
 .page-hero .hero-art {

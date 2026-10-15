@@ -1,6 +1,6 @@
 /** Label ID Responden berurutan (R001, R002, …). Modul murni. */
 
-export function formatLabel(prefix: string, n: number, width = 3): string {
+function formatLabel(prefix: string, n: number, width = 3): string {
   return `${prefix}${String(n).padStart(width, "0")}`;
 }
 

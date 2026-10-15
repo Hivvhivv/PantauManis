@@ -22,11 +22,10 @@ import type { Respondent, StaffUser } from "@/generated/prisma/client";
 
 /** Pesan umum (AC-02): penyebab kegagalan tidak dibedakan. */
 export const CODE_LOGIN_FAILED = "Kode tidak valid atau tidak aktif.";
-export const CODE_LOGIN_BLOCKED =
-  "Terlalu banyak percobaan. Silakan coba lagi beberapa menit lagi.";
+const CODE_LOGIN_BLOCKED = "Terlalu banyak percobaan. Silakan coba lagi beberapa menit lagi.";
 export const STAFF_LOGIN_FAILED = "Email atau kata sandi salah.";
 
-export function normalizeEmail(email: string): string {
+function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 

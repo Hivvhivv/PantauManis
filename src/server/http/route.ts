@@ -23,7 +23,7 @@ export function route<P = Record<string, never>>(handler: Handler<P>): Handler<P
   };
 }
 
-export function errorResponse(err: unknown): NextResponse {
+function errorResponse(err: unknown): NextResponse {
   if (err instanceof AppError) {
     return NextResponse.json(
       { error: { code: err.code, message: err.message, fields: err.fields ?? {} } },
@@ -53,7 +53,7 @@ export function errorResponse(err: unknown): NextResponse {
   );
 }
 
-export function zodFieldErrors(err: z.ZodError): FieldErrors {
+function zodFieldErrors(err: z.ZodError): FieldErrors {
   const fields: FieldErrors = {};
   for (const issue of err.issues) {
     const key = issue.path.join(".") || "_";

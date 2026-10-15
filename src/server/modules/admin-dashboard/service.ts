@@ -19,7 +19,7 @@ export const dashboardQuerySchema = z.object({
   to: z.iso.date().optional().catch(undefined),
   status: z.enum(["all", "not_started", "active", "done", "inactive"]).catch("all"),
 });
-export type DashboardQuery = z.infer<typeof dashboardQuerySchema>;
+type DashboardQuery = z.infer<typeof dashboardQuerySchema>;
 
 /**
  * Dashboard Admin agregat (FR-A-01). Data digabung tanpa identitas, kecuali daftar

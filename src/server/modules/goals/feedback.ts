@@ -13,7 +13,7 @@ export const GOAL_LIMITS: Record<GoalMetric, { min: number; max: number; unit: s
   sugar: { min: 0, max: 500, unit: "g gula" },
 };
 
-export const GOAL_CHANGE_INTERVAL_DAYS = 7;
+const GOAL_CHANGE_INTERVAL_DAYS = 7;
 
 /** Kata yang tidak boleh muncul di umpan balik (BR-10). */
 export const FORBIDDEN_FEEDBACK_WORDS = [
@@ -35,7 +35,7 @@ export function goalLabel(metric: GoalMetric, value: number): string {
     : `Maksimal ${value} g gula dari minuman per hari`;
 }
 
-export type WeekProgress = {
+type WeekProgress = {
   /** Hari yang dinilai (tercatat: Terisi atau Nol) dalam 7 hari terakhir sejak target berlaku. */
   recorded: number;
   achieved: number;

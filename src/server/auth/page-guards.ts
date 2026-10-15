@@ -30,7 +30,7 @@ export async function pageActor(user: { id: string }): Promise<Actor> {
   return { type: "staff", id: user.id, ip: ip.slice(0, 64) };
 }
 
-export async function respondentForPage() {
+async function respondentForPage() {
   const r = await resolveRespondentSession((await cookies()).get(RESPONDENT_COOKIE)?.value);
   if (!r) redirect("/masuk");
   return r;

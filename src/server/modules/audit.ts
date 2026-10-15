@@ -39,11 +39,11 @@ export const AuditAction = {
   ExportDownloaded: "export.downloaded",
 } as const;
 
-export type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];
+type AuditActionName = (typeof AuditAction)[keyof typeof AuditAction];
 
 export type Actor = { type: ActorType; id: string | null; ip: string | null };
 
-export type AuditEntry = {
+type AuditEntry = {
   actor: Actor;
   action: AuditActionName;
   targetType?:

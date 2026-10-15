@@ -2,7 +2,7 @@
 
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-export type ImageType = { ext: "jpg" | "png" | "webp"; contentType: string };
+type ImageType = { ext: "jpg" | "png" | "webp"; contentType: string };
 
 /** Tipe gambar dari isi file (magic bytes), bukan dari nama atau Content-Type kiriman browser. */
 export function detectImageType(bytes: Uint8Array): ImageType | null {
@@ -29,7 +29,7 @@ export function detectImageType(bytes: Uint8Array): ImageType | null {
 }
 
 /** Kunci file yang sah: edukasi/<uuid>.<ext>. Mencegah path traversal. */
-export const MEDIA_KEY_RE =
+const MEDIA_KEY_RE =
   /^edukasi\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|png|webp)$/;
 
 export function isMediaKey(key: string): boolean {

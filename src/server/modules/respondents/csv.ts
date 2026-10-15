@@ -9,8 +9,7 @@ import {
   type RespondentInput,
 } from "./schemas";
 
-export const IMPORT_MAX_ROWS = 500;
-export const IMPORT_COLUMNS = ["id_responden", "inisial", "tanggal_mulai", "catatan"] as const;
+const IMPORT_MAX_ROWS = 500;
 
 const rowSchema = z.object({
   id_responden: labelSchema,
@@ -19,7 +18,7 @@ const rowSchema = z.object({
   catatan: z.preprocess((v) => (v === "" ? undefined : v), notesSchema.optional()),
 });
 
-export type ImportResult =
+type ImportResult =
   | { ok: true; rows: (RespondentInput & { label: string })[] }
   | { ok: false; errors: { row: number; message: string }[] };
 
@@ -84,6 +83,7 @@ export function csvSafe(value: string): string {
   return /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
 }
 
+/** CSV standar: koma, UTF-8 dengan BOM, CRLF, aman dari formula injection. */
 export function toCsv(header: string[], rows: string[][]): string {
   return (
     "﻿" +

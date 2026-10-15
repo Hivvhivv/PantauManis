@@ -4,8 +4,7 @@
  * boolean 1/0; nilai kosong = sel kosong (bukan 0).
  */
 import { addDays, diffDays } from "@/server/modules/study/days";
-import { csvSafe } from "@/server/modules/respondents/csv";
-import Papa from "papaparse";
+import { toCsv } from "@/server/modules/respondents/csv";
 
 export type Cell = string | number | null;
 export type Column = { key: string; header: string; description: string };
@@ -24,7 +23,7 @@ export function isoWib(d: Date | null | undefined): string | null {
 
 export const bit = (v: boolean) => (v ? 1 : 0);
 
-export type DailyStatusCode = "terisi" | "nol" | "belum_diisi" | "belum_berlangsung";
+type DailyStatusCode = "terisi" | "nol" | "belum_diisi" | "belum_berlangsung";
 
 /**
  * Ringkasan harian satu responden: tepat `durationDays` baris (AC-12).
@@ -65,9 +64,9 @@ export function dailySummaryRows(params: {
 
 const cellText = (v: Cell) => (v === null || v === undefined ? "" : String(v));
 
-/** CSV standar: koma, UTF-8 dengan BOM, CRLF, aman dari formula injection. */
 export function tableToCsv(t: Table): string {
-  const header = t.columns.map((c) => c.header);
-  const data = t.rows.map((r) => t.columns.map((c) => csvSafe(cellText(r[c.key] ?? null))));
-  return "﻿" + Papa.unparse({ fields: header, data }, { newline: "\r\n" });
+  return toCsv(
+    t.columns.map((c) => c.header),
+    t.rows.map((r) => t.columns.map((c) => cellText(r[c.key] ?? null))),
+  );
 }

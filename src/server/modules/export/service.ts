@@ -7,15 +7,7 @@ import { classifyStatus } from "@/server/modules/study/aggregate";
 import { addDays, fromDbDate, localDateOf } from "@/server/modules/study/days";
 import { completeness } from "@/server/modules/study/series";
 import { getStudySettings } from "@/server/modules/study/settings";
-import {
-  bit,
-  dailySummaryRows,
-  isoWib,
-  tableToCsv,
-  type Cell,
-  type Column,
-  type Table,
-} from "./build";
+import { bit, dailySummaryRows, isoWib, type Cell, type Column, type Table } from "./build";
 
 export const DATASETS = [
   "responden",
@@ -427,4 +419,4 @@ export async function auditExport(
   });
 }
 
-export { tableToCsv };
+export { tableToCsv } from "./build";

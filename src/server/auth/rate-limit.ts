@@ -7,11 +7,11 @@ import { AuditAction, writeAudit } from "@/server/modules/audit";
  * Percobaan yang ditolak karena rate limit (blocked = true) tidak dihitung, sehingga satu IP
  * yang terus mencoba tidak dapat memicu jeda global sendirian.
  */
-export const WINDOW_MS = 15 * 60 * 1000;
-export const PER_KEY_LIMIT = 5;
+const WINDOW_MS = 15 * 60 * 1000;
+const PER_KEY_LIMIT = 5;
 export const GLOBAL_CODE_LIMIT = 50;
-export const GLOBAL_PAUSE_MS = 5 * 60 * 1000;
-export const ALERT_CODE_LOGIN_PAUSED = "code_login_paused";
+const GLOBAL_PAUSE_MS = 5 * 60 * 1000;
+const ALERT_CODE_LOGIN_PAUSED = "code_login_paused";
 
 const since = (now: Date, ms: number) => new Date(now.getTime() - ms);
 

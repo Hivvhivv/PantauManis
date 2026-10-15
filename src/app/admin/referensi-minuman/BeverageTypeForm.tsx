@@ -6,7 +6,7 @@ import { api, type ApiError } from "@/lib/api-client";
 import { useHydrated } from "@/lib/use-hydrated";
 import { FieldError } from "@/components/FieldError";
 
-export type BeverageDefaults = {
+type BeverageDefaults = {
   id?: string;
   name: string;
   icon: string;

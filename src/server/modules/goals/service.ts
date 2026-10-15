@@ -37,7 +37,7 @@ export const goalInputSchema = z
       });
     }
   });
-export type GoalInput = z.infer<typeof goalInputSchema>;
+type GoalInput = z.infer<typeof goalInputSchema>;
 
 /** Target aktif, riwayat, progres 7 hari, dan umpan balik (FR-R-06). */
 export async function getGoalState(r: ReadyRespondent, now = new Date()) {

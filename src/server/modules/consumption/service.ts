@@ -198,9 +198,3 @@ export async function clearZeroDay(r: ReadyRespondent, date: string, now = new D
   });
   if (res.count === 0) throw businessRule("NOT_ZERO", "Hari ini tidak berstatus Nol.");
 }
-
-/** Untuk form: tanggal yang masih boleh diisi/diubah. */
-export async function editableWindow(r: ReadyRespondent, now = new Date()) {
-  const ctx = await context(r, now);
-  return editableDates(ctx.today, ctx.dayOne, ctx.settings.backfillDays);
-}

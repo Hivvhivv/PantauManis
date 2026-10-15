@@ -4,7 +4,7 @@ import { prisma } from "@/server/db";
 import type { Prisma } from "@/generated/prisma/client";
 import { AuditAction, actionLabel } from "./audit";
 
-export const AUDIT_PAGE_SIZE = 50;
+const AUDIT_PAGE_SIZE = 50;
 
 export const auditQuerySchema = z.object({
   action: z.string().max(64).optional().catch(undefined),
@@ -13,7 +13,7 @@ export const auditQuerySchema = z.object({
   to: z.iso.date().optional().catch(undefined),
   page: z.coerce.number().int().min(1).catch(1),
 });
-export type AuditQuery = z.infer<typeof auditQuerySchema>;
+type AuditQuery = z.infer<typeof auditQuerySchema>;
 
 export const KNOWN_ACTIONS = Object.values(AuditAction).sort();
 

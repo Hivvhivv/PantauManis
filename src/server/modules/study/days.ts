@@ -2,7 +2,7 @@
  * Kalender penelitian (BR-01, BR-05, ADR-005). Modul murni.
  * Tanggal lokal ditulis sebagai string "YYYY-MM-DD" menurut Asia/Jakarta.
  */
-export const STUDY_TZ = "Asia/Jakarta";
+const STUDY_TZ = "Asia/Jakarta";
 
 const localFmt = new Intl.DateTimeFormat("en-CA", {
   timeZone: STUDY_TZ,

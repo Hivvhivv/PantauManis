@@ -15,7 +15,7 @@ export type DayPoint = {
 };
 
 export type LogLite = { localDate: string; servings: number; sugarG: number; beverage: string };
-export type StatusLite = { date: string; status: "filled" | "zero" };
+type StatusLite = { date: string; status: "filled" | "zero" };
 
 export const RANGES = {
   "1w": { label: "1 minggu", days: 7 },

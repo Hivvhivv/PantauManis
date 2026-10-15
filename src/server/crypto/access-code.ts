@@ -4,8 +4,8 @@
  */
 import { createHmac, randomInt } from "node:crypto";
 
-export const CODE_LENGTH = 6;
-export const CODE_PREFIX = "PM-";
+const CODE_LENGTH = 6;
+const CODE_PREFIX = "PM-";
 
 /** true jika kode mudah ditebak: digit sama, urut, berulang, atau cerminan. */
 export function isPatterned(digits: string): boolean {

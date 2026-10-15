@@ -12,7 +12,7 @@ import type { StaffRole, StaffUser } from "@/generated/prisma/client";
 import { checkStaffChange, type StaffChange } from "./rules";
 import type { CreateUserInput, UpdateStaffInput, UserListQuery } from "./schemas";
 
-export const USER_PAGE_SIZE = 20;
+const USER_PAGE_SIZE = 20;
 
 // Kunci advisory agar pemeriksaan "minimal satu Superadmin aktif" tidak bisa dilewati oleh
 // dua request yang berjalan bersamaan.
@@ -42,7 +42,7 @@ async function enforceRules(tx: Tx, actor: Actor, target: StaffUser, change: Sta
   if (violation) throw businessRule(violation.code, violation.message);
 }
 
-export type CreateUserResult =
+type CreateUserResult =
   | { kind: "staff"; id: string; temporaryPassword: string | null }
   | { kind: "respondent"; issued: IssuedCode };
 
@@ -188,7 +188,7 @@ export async function getStaff(id: string) {
   };
 }
 
-export type UserRow = {
+type UserRow = {
   kind: "staff" | "respondent";
   id: string;
   role: StaffRole | "respondent";

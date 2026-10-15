@@ -13,7 +13,7 @@ import {
   type SugarLevel,
 } from "@/server/modules/study/estimate";
 
-export type BeverageOption = {
+type BeverageOption = {
   id: string;
   name: string;
   icon: string;
@@ -22,7 +22,7 @@ export type BeverageOption = {
   sugarLevelApplicable: boolean;
 };
 
-export type LogFormInitial = {
+type LogFormInitial = {
   id?: string;
   beverageTypeId: string;
   volumeMl: number | "";

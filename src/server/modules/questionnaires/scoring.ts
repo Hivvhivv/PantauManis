@@ -7,7 +7,7 @@ export type QuestionDef = {
   options: QuestionOption[] | null;
 };
 
-export const TEXT_ANSWER_MAX = 2000;
+const TEXT_ANSWER_MAX = 2000;
 
 /** Pesan error per id butir; kosong berarti valid. `requireAll` dipakai saat kirim, bukan saat simpan draf. */
 export function validateAnswers(

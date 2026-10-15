@@ -20,7 +20,7 @@ import { parseImportCsv, toCsv } from "./csv";
 import { labelRange, nextLabelNumber } from "./labels";
 import type { BulkCreateInput, ListQuery, RespondentInput, RespondentUpdate } from "./schemas";
 
-export const PAGE_SIZE = 20;
+const PAGE_SIZE = 20;
 
 /** Kode akses yang baru dibuat. Teks kode hanya dikembalikan ke staf, tidak pernah dicatat di log. */
 export type IssuedCode = { id: string; label: string; code: string; codeForCard: string };
@@ -49,14 +49,21 @@ function decryptDigits(encrypted: string): string {
   return decrypt(encrypted, env().ACCESS_CODE_ENC_KEY);
 }
 
+const issuedCode = (id: string, label: string, digits: string): IssuedCode => ({
+  id,
+  label,
+  code: formatAccessCode(digits),
+  codeForCard: formatAccessCodeForCard(digits),
+});
+
 async function allLabels(tx: Tx | typeof prisma = prisma): Promise<string[]> {
   // Termasuk responden terhapus: label tetap unik agar data penelitian tidak tertukar.
   const rows = await tx.respondent.findMany({ select: { label: true } });
   return rows.map((r) => r.label);
 }
 
-export async function suggestNextLabel(prefix = "R"): Promise<string> {
-  return labelRange(prefix, nextLabelNumber(await allLabels(), prefix), 1)[0]!;
+export async function suggestNextLabel(tx: Tx | typeof prisma = prisma) {
+  return labelRange("R", nextLabelNumber(await allLabels(tx), "R"), 1)[0]!;
 }
 
 async function assertLabelsFree(tx: Tx, labels: string[], exceptId?: string) {
@@ -100,19 +107,14 @@ async function insertRespondents(
       { actor, action: AuditAction.RespondentCreated, targetType: "respondent", targetId: r.id },
       tx,
     );
-    issued.push({
-      id: r.id,
-      label: r.label,
-      code: formatAccessCode(code.digits),
-      codeForCard: formatAccessCodeForCard(code.digits),
-    });
+    issued.push(issuedCode(r.id, r.label, code.digits));
   }
   return issued;
 }
 
 export async function createRespondent(input: RespondentInput, actor: Actor): Promise<IssuedCode> {
   return prisma.$transaction(async (tx) => {
-    const label = input.label ?? labelRange("R", nextLabelNumber(await allLabels(tx), "R"), 1)[0]!;
+    const label = input.label ?? (await suggestNextLabel(tx));
     const [issued] = await insertRespondents(tx, [{ ...input, label }], actor);
     return issued!;
   });
@@ -206,7 +208,7 @@ export async function revealCode(id: string, actor: Actor) {
 /** Reset kode: kode lama langsung tidak berlaku, sesi dicabut, data penelitian tetap utuh (BR-08, AC-10). */
 export async function resetCode(id: string, actor: Actor): Promise<IssuedCode> {
   await findActive(id);
-  const issued = await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const code = await newUniqueCode(tx);
     const r = await tx.respondent.update({
       where: { id },
@@ -217,14 +219,8 @@ export async function resetCode(id: string, actor: Actor): Promise<IssuedCode> {
       { actor, action: AuditAction.RespondentCodeReset, targetType: "respondent", targetId: id },
       tx,
     );
-    return {
-      id,
-      label: r.label,
-      code: formatAccessCode(code.digits),
-      codeForCard: formatAccessCodeForCard(code.digits),
-    };
+    return issuedCode(id, r.label, code.digits);
   });
-  return issued;
 }
 
 export async function setAccessStatus(id: string, status: "active" | "inactive", actor: Actor) {
@@ -263,7 +259,7 @@ export async function softDeleteRespondent(id: string, actor: Actor) {
   await revokeRespondentSessions(id);
 }
 
-export type Progress = {
+type Progress = {
   pretestDone: boolean;
   /** Hari ke- hari ini (null = belum pretest). Bisa > durasi setelah periode berakhir. */
   studyDay: number | null;
@@ -271,7 +267,7 @@ export type Progress = {
   completeness: { filled: number; elapsed: number } | null;
 };
 
-export type RespondentListItem = {
+type RespondentListItem = {
   id: string;
   label: string;
   initials: string | null;
@@ -299,32 +295,21 @@ async function progressFor(rows: { id: string; dayOneDate: Date | null }[], now 
     list.push(fromDbDate(s.date));
     byResp.set(s.respondentId, list);
   }
+  const { durationDays } = settings;
   return new Map<string, Progress>(
     rows.map((r) => {
       if (!r.dayOneDate) {
-        return [
-          r.id,
-          {
-            pretestDone: false,
-            studyDay: null,
-            durationDays: settings.durationDays,
-            completeness: null,
-          },
-        ];
+        return [r.id, { pretestDone: false, studyDay: null, durationDays, completeness: null }];
       }
       const dayOne = fromDbDate(r.dayOneDate);
+      const statusDates = byResp.get(r.id) ?? [];
       return [
         r.id,
         {
           pretestDone: true,
           studyDay: studyDayOf(dayOne, today),
-          durationDays: settings.durationDays,
-          completeness: completeness({
-            dayOne,
-            today,
-            durationDays: settings.durationDays,
-            statusDates: byResp.get(r.id) ?? [],
-          }),
+          durationDays,
+          completeness: completeness({ dayOne, today, durationDays, statusDates }),
         },
       ];
     }),

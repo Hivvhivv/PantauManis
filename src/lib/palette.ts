@@ -1,5 +1,5 @@
 /** Warna kategori untuk grafik komposisi dan legendanya (harus sama di keduanya). */
-export const CATEGORY_COLORS = [
+const CATEGORY_COLORS = [
   "#c96f3b",
   "#d9a35c",
   "#8a9a5b",
