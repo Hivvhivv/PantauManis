@@ -97,7 +97,33 @@ describe("Materi Edukasi: Admin (FR-A-05)", () => {
     expect((await call(reorder, { cookie, body: { ids: [a] } })).status).toBe(422);
   });
 
-  it("unggah gambar: PNG diterima lalu bisa disajikan; file bukan gambar dan > 5 MB ditolak", async () => {
+  it("unggah gambar: penyimpanan belum diatur → 503 dengan penyebab yang jelas untuk staf", async () => {
+    const cookie = await adminCookie();
+    const send = () => {
+      const f = new FormData();
+      f.set("file", new File([PNG], "gambar.png", { type: "image/png" }));
+      return call(upload, { cookie, form: f });
+    };
+    const saved = { ...process.env };
+    try {
+      process.env.VERCEL = "1"; // driver lokal di Vercel: sistem file hanya-baca
+      const onVercel = await send();
+      expect(onVercel.status).toBe(503);
+      expect(onVercel.json.error.code).toBe("STORAGE_NOT_CONFIGURED");
+      expect(onVercel.json.error.message).toMatch(/STORAGE_DRIVER=supabase/);
+
+      process.env.STORAGE_DRIVER = "supabase"; // tanpa SUPABASE_URL / service key
+      delete process.env.SUPABASE_URL;
+      delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const noKeys = await send();
+      expect(noKeys.status).toBe(503);
+      expect(noKeys.json.error.message).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
+    } finally {
+      process.env = saved;
+    }
+  });
+
+  it("unggah gambar: PNG diterima lalu bisa disajikan; file bukan gambar dan > 4 MB ditolak", async () => {
     const cookie = await adminCookie();
     const form = (bytes: Uint8Array<ArrayBuffer>, name: string, type: string) => {
       const f = new FormData();
@@ -118,7 +144,7 @@ describe("Materi Edukasi: Admin (FR-A-05)", () => {
     expect(svg.status).toBe(422);
     const big = await call(upload, {
       cookie,
-      form: form(new Uint8Array(5 * 1024 * 1024 + 1), "b.png", "image/png"),
+      form: form(new Uint8Array(4 * 1024 * 1024 + 1), "b.png", "image/png"),
     });
     expect(big.status).toBe(422);
 

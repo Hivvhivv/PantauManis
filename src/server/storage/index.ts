@@ -15,6 +15,12 @@ interface MediaStorage {
   publicUrl(key: string): string;
 }
 
+/**
+ * Penyimpanan belum diatur dengan benar di server. Pesannya untuk staf (tanpa rahasia),
+ * agar penyebabnya terlihat tanpa membuka log hosting.
+ */
+export class StorageConfigError extends Error {}
+
 function assertKey(key: string) {
   if (!isMediaKey(key)) throw new Error("Kunci media tidak valid");
 }
@@ -33,6 +39,12 @@ function localDir(): string {
 const localStorage: MediaStorage = {
   async put(key, bytes) {
     assertKey(key);
+    if (process.env.VERCEL) {
+      // Sistem file Vercel hanya-baca dan tidak permanen.
+      throw new StorageConfigError(
+        "Penyimpanan gambar belum diatur di server. Isi STORAGE_DRIVER=supabase, SUPABASE_URL, dan SUPABASE_SERVICE_ROLE_KEY di Vercel, lalu redeploy.",
+      );
+    }
     const file = path.join(localDir(), key);
     await mkdir(path.dirname(file), { recursive: true });
     await writeFile(file, bytes);
@@ -64,8 +76,8 @@ function supabaseStorage(): MediaStorage {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const bucket = process.env.SUPABASE_STORAGE_BUCKET ?? "edukasi";
   if (!url || !serviceKey) {
-    throw new Error(
-      "SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY wajib diisi untuk STORAGE_DRIVER=supabase",
+    throw new StorageConfigError(
+      "Penyimpanan gambar belum lengkap: SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY wajib diisi di server.",
     );
   }
   const headers = { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey };
@@ -82,8 +94,21 @@ function supabaseStorage(): MediaStorage {
         },
         body: Buffer.from(bytes),
       });
-      // Pesan dari Supabase tidak diteruskan ke pengguna; cukup status.
-      if (!res.ok) throw new Error(`Unggah ke Supabase Storage gagal (HTTP ${res.status})`);
+      if (!res.ok) {
+        // Pesan mentah dari Supabase tidak diteruskan; hanya penyebab yang bisa ditindaklanjuti.
+        const body = await res.text().catch(() => "");
+        if (/bucket not found/i.test(body)) {
+          throw new StorageConfigError(
+            `Bucket "${bucket}" belum ada di Supabase Storage. Buat bucket publik bernama "${bucket}" (Storage → New bucket).`,
+          );
+        }
+        if (res.status === 401 || res.status === 403) {
+          throw new StorageConfigError(
+            "Supabase menolak kunci akses. Periksa SUPABASE_SERVICE_ROLE_KEY di server.",
+          );
+        }
+        throw new Error(`Unggah ke Supabase Storage gagal (HTTP ${res.status})`);
+      }
     },
     async remove(key) {
       assertKey(key);

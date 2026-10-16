@@ -5,7 +5,7 @@ import type { ReadyRespondent } from "@/server/auth/guards";
 import { AppError, notFound, validationError } from "@/server/http/errors";
 import { AuditAction, writeAudit, type Actor } from "@/server/modules/audit";
 import { fromDbDate, localDateOf, studyDayOf } from "@/server/modules/study/days";
-import { mediaStorage } from "@/server/storage";
+import { mediaStorage, StorageConfigError } from "@/server/storage";
 import { detectImageType, MAX_IMAGE_BYTES } from "@/server/storage/media";
 import { isUnlocked, quizMessage, scoreQuiz, youtubeEmbedUrl, youtubeId } from "./rules";
 import type { MaterialInput } from "./schemas";
@@ -157,10 +157,10 @@ export async function reorderMaterials(ids: string[], actor: Actor) {
   });
 }
 
-/** Unggah gambar: tipe dicek dari isi file, maksimal 5 MB, nama file acak. */
+/** Unggah gambar: tipe dicek dari isi file, maksimal 4 MB, nama file acak. */
 export async function uploadImage(file: File) {
   if (file.size === 0) throw validationError({ file: "Pilih file gambar." });
-  if (file.size > MAX_IMAGE_BYTES) throw validationError({ file: "Ukuran gambar maksimal 5 MB." });
+  if (file.size > MAX_IMAGE_BYTES) throw validationError({ file: "Ukuran gambar maksimal 4 MB." });
   const bytes = new Uint8Array(await file.arrayBuffer());
   const type = detectImageType(bytes);
   if (!type) throw validationError({ file: "Format gambar harus JPG, PNG, atau WebP." });
@@ -169,6 +169,10 @@ export async function uploadImage(file: File) {
     await mediaStorage().put(key, bytes, type.contentType);
   } catch (e) {
     console.error("Unggah media gagal:", e instanceof Error ? e.message : "unknown");
+    // Endpoint khusus staf: penyebab konfigurasi ditampilkan agar bisa langsung diperbaiki.
+    if (e instanceof StorageConfigError) {
+      throw new AppError(503, "STORAGE_NOT_CONFIGURED", e.message);
+    }
     throw new AppError(502, "UPLOAD_FAILED", "Gambar gagal diunggah. Coba lagi nanti.");
   }
   return { key, url: mediaStorage().publicUrl(key) };

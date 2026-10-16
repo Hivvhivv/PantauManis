@@ -48,6 +48,15 @@ export function MaterialForm({ defaults }: { defaults: MaterialDefaults }) {
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Cek di browser dulu: file > 4,5 MB sudah ditolak hosting sebelum sampai ke server.
+    if (file.size > 4 * 1024 * 1024) {
+      e.target.value = "";
+      return setError({
+        code: "FILE_TOO_LARGE",
+        message: "Ukuran gambar maksimal 4 MB. Perkecil gambar lalu coba lagi.",
+        fields: { file: "Ukuran gambar maksimal 4 MB." },
+      });
+    }
     const form = new FormData();
     form.set("file", file);
     setUploading(true);
@@ -242,7 +251,7 @@ export function MaterialForm({ defaults }: { defaults: MaterialDefaults }) {
             <h2 style={{ margin: 0, fontSize: "1.1rem" }}>Media</h2>
             <div>
               <label htmlFor="image">
-                Gambar/infografis <span className="hint">JPG, PNG, atau WebP, maks. 5 MB</span>
+                Gambar/infografis <span className="hint">JPG, PNG, atau WebP, maks. 4 MB</span>
               </label>
               {m.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element

@@ -3,7 +3,7 @@ import { validationError } from "@/server/http/errors";
 import { json, route } from "@/server/http/route";
 import { uploadImage } from "@/server/modules/education/service";
 
-/** Unggah gambar materi (maks. 5 MB; JPG/PNG/WebP, dicek dari isi file). */
+/** Unggah gambar materi (maks. 4 MB; JPG/PNG/WebP, dicek dari isi file). */
 export const POST = route(async (req) => {
   await requireStaff(req);
   const form = await req.formData().catch(() => null);

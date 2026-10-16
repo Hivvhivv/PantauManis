@@ -65,7 +65,7 @@ Atur di dashboard hosting, bukan di repositori:
 
 ## Storage untuk materi edukasi (ADR-008)
 
-1. Di Supabase: **Storage → New bucket**, nama `edukasi`, centang **Public bucket**. Batasi tipe file (image/jpeg, image/png, image/webp) dan ukuran (5 MB) bila tersedia.
+1. Di Supabase: **Storage → New bucket**, nama `edukasi`, centang **Public bucket**. Batasi tipe file (image/jpeg, image/png, image/webp) dan ukuran (4 MB) bila tersedia.
 2. Ambil **Project URL** dan **service_role key** (Project Settings → API). Service role key memberi akses penuh: simpan hanya di env server, jangan dibagikan atau ditempel di chat.
 3. Env server aplikasi (hosting):
    ```dotenv

@@ -1,6 +1,7 @@
 /** Validasi file gambar unggahan (ADR-008). Modul murni. */
 
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+/** 4 MB: Vercel menolak body request di atas 4,5 MB sebelum sampai ke aplikasi. */
+export const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 type ImageType = { ext: "jpg" | "png" | "webp"; contentType: string };
 
