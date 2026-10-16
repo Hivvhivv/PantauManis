@@ -2347,6 +2347,12 @@ a.edu-card:hover {
 .install-card .row {
   grid-column: 1 / -1;
 }
+.install-steps {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.2rem;
+}
 .install-emoji {
   font-size: 1.8rem;
 }
