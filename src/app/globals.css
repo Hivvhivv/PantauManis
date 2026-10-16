@@ -748,6 +748,7 @@ dl.meta dd {
   cursor: pointer;
 }
 .segmented a[aria-current="true"],
+.segmented a[aria-current="page"],
 .segmented input:checked + label {
   background: var(--surface);
   color: var(--primary);

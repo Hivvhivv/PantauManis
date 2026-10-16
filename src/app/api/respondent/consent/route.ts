@@ -12,5 +12,7 @@ export const POST = route(async (req) => {
   const r = await requireRespondent(req);
   await parseJson(req, bodySchema);
   await giveConsent(r);
-  return json({ redirectTo: respondentHomePath({ consentAt: new Date() }) });
+  return json({
+    redirectTo: respondentHomePath({ consentAt: new Date(), dayOneDate: r.dayOneDate }),
+  });
 });

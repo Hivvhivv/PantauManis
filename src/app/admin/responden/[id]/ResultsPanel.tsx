@@ -259,45 +259,52 @@ function StartedResults({ data }: { data: Extract<RespondentResults, { started: 
 
 type Q = RespondentResults["pretest"];
 
+/** Pretest dan posttest punya soal berbeda (ADR-010): ringkasan skor lalu jawaban per kuesioner. */
 function QuestionnaireComparison({ pre, post }: { pre: Q; post: Q }) {
-  if (!pre) return null;
-  const status = (q: Q) =>
-    !q || !q.status
-      ? "Belum"
-      : q.status === "draft"
-        ? "Draf"
-        : `Terkirim ${formatDateTime(q.submittedAt)}`;
+  if (!pre && !post) return null;
   return (
     <>
-      <h3 className="chart-title">Pretest vs posttest</h3>
+      <h3 className="chart-title">
+        Skor pretest {pre?.score ?? "—"} · posttest {post?.score ?? "—"}
+      </h3>
+      <QuestionnaireTable title="Pretest" q={pre} />
+      <QuestionnaireTable title="Posttest" q={post} />
+    </>
+  );
+}
+
+function QuestionnaireTable({ title, q }: { title: string; q: Q }) {
+  if (!q) return null;
+  const status = !q.status
+    ? "belum diisi"
+    : q.status === "draft"
+      ? "draf"
+      : `terkirim ${formatDateTime(q.submittedAt)}`;
+  return (
+    <>
+      <h3 className="chart-title">
+        {title} <span className="muted small">({status})</span>
+      </h3>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
               <th scope="col">Pertanyaan</th>
-              <th scope="col">Pretest</th>
-              <th scope="col">Posttest</th>
+              <th scope="col">Jawaban</th>
             </tr>
           </thead>
           <tbody>
-            {pre.answers.map((a, i) => (
+            {q.answers.map((a) => (
               <tr key={a.order}>
                 <td>
                   {a.order}. {a.text}
                 </td>
                 <td>{a.answer ?? "—"}</td>
-                <td>{post?.answers[i]?.answer ?? "—"}</td>
               </tr>
             ))}
             <tr>
               <th scope="row">Skor</th>
-              <td>{pre.score ?? "—"}</td>
-              <td>{post?.score ?? "—"}</td>
-            </tr>
-            <tr>
-              <th scope="row">Status</th>
-              <td className="small">{status(pre)}</td>
-              <td className="small">{status(post)}</td>
+              <td>{q.score ?? "—"}</td>
             </tr>
           </tbody>
         </table>

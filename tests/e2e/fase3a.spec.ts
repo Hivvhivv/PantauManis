@@ -73,7 +73,7 @@ test("AC-04/AC-05: hasil responden hanya diambil saat tombol diklik", async ({
 
   await page.getByRole("button", { name: "Lihat Hasil Responden" }).click();
   await expect(page.getByRole("heading", { name: `Hasil responden ${r.label}` })).toBeVisible();
-  await expect(page.getByText("Pretest vs posttest")).toBeVisible();
+  await expect(page.getByText(/Skor pretest .* posttest/)).toBeVisible();
   expect(resultCalls).toHaveLength(1); // AC-05
 
   await page.getByRole("button", { name: "Sembunyikan Hasil" }).click();

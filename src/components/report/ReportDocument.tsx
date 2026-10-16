@@ -401,45 +401,54 @@ function Goals({ goals }: { goals: Started["goals"] }) {
 
 type Q = RespondentReport["pretest"];
 
+/** Pretest dan posttest punya soal berbeda (ADR-010): satu tabel per kuesioner. */
 function Questionnaires({ pre, post }: { pre: Q; post: Q }) {
-  if (!pre) return <p className="report-note">Instrumen kuesioner belum tersedia.</p>;
-  const status = (q: Q) =>
-    !q || !q.status
-      ? "Belum"
-      : q.status === "draft"
-        ? "Draf"
-        : `Terkirim ${formatDateTime(q.submittedAt)}`;
+  if (!pre && !post) return <p className="report-note">Instrumen kuesioner belum tersedia.</p>;
   return (
-    <table className="report-table">
-      <thead>
-        <tr>
-          <th scope="col">Pertanyaan</th>
-          <th scope="col">Pretest</th>
-          <th scope="col">Posttest</th>
-        </tr>
-      </thead>
-      <tbody>
-        {pre.answers.map((a, i) => (
-          <tr key={a.order}>
-            <td>
-              {a.order}. {a.text}
-            </td>
-            <td>{a.answer ?? "—"}</td>
-            <td>{post?.answers[i]?.answer ?? "—"}</td>
-          </tr>
-        ))}
-        <tr className="report-total">
-          <th scope="row">Skor</th>
-          <td>{pre.score ?? "—"}</td>
-          <td>{post?.score ?? "—"}</td>
-        </tr>
-        <tr>
-          <th scope="row">Status</th>
-          <td>{status(pre)}</td>
-          <td>{status(post)}</td>
-        </tr>
-      </tbody>
-    </table>
+    <>
+      <p style={{ margin: 0 }}>
+        <strong>Skor pretest {pre?.score ?? "—"}</strong> ·{" "}
+        <strong>Skor posttest {post?.score ?? "—"}</strong>
+      </p>
+      {(
+        [
+          ["Pretest", pre],
+          ["Posttest", post],
+        ] as const
+      ).map(([title, q]) =>
+        q ? (
+          <table key={title} className="report-table">
+            <thead>
+              <tr>
+                <th scope="col">
+                  {title} ·{" "}
+                  {!q.status
+                    ? "belum diisi"
+                    : q.status === "draft"
+                      ? "draf"
+                      : `terkirim ${formatDateTime(q.submittedAt)}`}
+                </th>
+                <th scope="col">Jawaban</th>
+              </tr>
+            </thead>
+            <tbody>
+              {q.answers.map((a) => (
+                <tr key={a.order}>
+                  <td>
+                    {a.order}. {a.text}
+                  </td>
+                  <td>{a.answer ?? "—"}</td>
+                </tr>
+              ))}
+              <tr className="report-total">
+                <th scope="row">Skor</th>
+                <td>{q.score ?? "—"}</td>
+              </tr>
+            </tbody>
+          </table>
+        ) : null,
+      )}
+    </>
   );
 }
 

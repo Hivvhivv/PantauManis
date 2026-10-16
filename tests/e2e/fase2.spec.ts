@@ -26,11 +26,14 @@ test("alur Responden: kode → persetujuan → pretest → catat → beranda →
   await page.getByLabel(/bersedia ikut serta/).check();
   await agreeBtn.click();
 
-  // Beranda sebelum pretest: fitur terkunci, tombol Isi Kuesioner Awal.
+  // Pretest langsung tampil; bila keluar ke Beranda, ada tombol untuk kembali mengisi.
+  await expect(page).toHaveURL(/\/pretest$/);
+  await page.getByRole("link", { name: "← Kembali ke Beranda" }).click();
   await expect(page).toHaveURL(/\/beranda$/);
   await expect(page.getByText("Terbuka setelah kuesioner awal dikirim")).toBeVisible();
   await page.goto("/catat");
-  await expect(page).toHaveURL(/\/beranda$/);
+  await expect(page).toHaveURL(/\/pretest$/);
+  await page.goto("/beranda");
   await page.getByRole("link", { name: "Isi Kuesioner Awal" }).click();
 
   // Pretest: jawab semua butir pilihan, lalu kirim.

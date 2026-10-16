@@ -9,8 +9,12 @@ test("Admin membuka menu Kuesioner (ADR-010)", async ({ page }, info) => {
   await page.getByLabel("Kata sandi").fill(PASSWORD);
   await page.getByRole("button", { name: "Masuk" }).click();
   await page.getByRole("link", { name: "Kuesioner" }).click();
-  await expect(page.getByRole("heading", { name: /Kuesioner Pretest/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kuesioner", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Pretest" })).toHaveAttribute("aria-current", "page");
   await expect(page.getByText("Soal 1").first()).toBeVisible();
+  await page.getByRole("link", { name: "Posttest" }).click();
+  await expect(page).toHaveURL(/jenis=posttest$/);
+  await expect(page.getByText(/Terbuka pada hari ke-14/)).toBeVisible();
   // Test lain sudah mengisi pretest di database e2e, jadi soal di sini terkunci (hanya-baca)
   // atau, pada database baru, masih bisa ditambah.
   await expect(page.getByText(/Soal terkunci|\+ Skala 1–5/).first()).toBeVisible();

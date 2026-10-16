@@ -7,7 +7,12 @@ Fase 4 PRD: uji coba (pilot) dengan 3–5 responden sebelum rekrutmen penuh.
 **Konten. Semua yang berlabel CONTOH wajib diganti:**
 
 - [ ] Teks lembar informasi & persetujuan resmi komite etik: menu **Pengaturan** (Superadmin).
-- [ ] Instrumen pretest/posttest final: isi di menu **Kuesioner** (ADR-010) **sebelum** responden mana pun mulai mengisi. Setelah ada satu jawaban, soal terkunci.
+- [ ] Instrumen final di menu **Kuesioner** (ADR-010), tab **Pretest** dan **Posttest**:
+  - soal pretest diisi **sebelum** responden mana pun mulai mengisi;
+  - soal posttest diisi sebelum responden pertama mencapai hari ke-14.
+
+  Setelah ada satu jawaban, soal jenis itu terkunci.
+
 - [ ] Nilai gula di **Referensi Minuman**: isi sumber, lalu hilangkan centang "perlu diverifikasi". Peringatan kuning di halaman itu harus hilang.
 - [ ] Materi **Edukasi** diterbitkan, dengan jadwal hari ke-N bila perlu.
 - [ ] Penyimpanan **nama lengkap** responden disetujui komite etik dan disebutkan di teks persetujuan (ADR-009). Jika tidak disetujui, kosongkan kolom Nama lengkap.

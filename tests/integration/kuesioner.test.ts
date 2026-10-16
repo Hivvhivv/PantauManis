@@ -37,6 +37,7 @@ afterEach(async () => {
 });
 
 const INSTRUMENT = {
+  type: "pretest",
   questions: [
     {
       type: "likert",
@@ -71,28 +72,41 @@ async function staff() {
 }
 
 describe("Kuesioner oleh staf (ADR-010)", () => {
-  it("menyimpan satu set soal untuk pretest DAN posttest, dengan skor terbalik", async () => {
+  it("soal pretest dan posttest disimpan terpisah, dengan skor terbalik", async () => {
     const cookie = await staff();
+    const postBefore = (await getInstrument("posttest")).questions;
     const res = await call(saveRoute, { cookie, method: "PUT", body: INSTRUMENT });
     expect(res.status).toBe(200);
 
-    for (const type of ["pretest", "posttest"] as const) {
-      const q = await prisma.questionnaire.findFirstOrThrow({
-        where: { type, isActive: true },
-        include: { questions: { orderBy: { order: "asc" } } },
-      });
-      expect(q.isPlaceholder).toBe(false);
-      expect(q.questions.map((x) => [x.order, x.type, x.text])).toEqual([
-        [1, "likert", "Seberapa sering kamu minum minuman manis?"],
-        [2, "likert", "Saya sulit menolak minuman manis."],
-        [3, "choice", "Ukuran gelas favorit?"],
-        [4, "text", "Minuman favoritmu?"],
-      ]);
-      expect(q.questions[3]!.options).toBeNull();
-    }
-    const inst = await getInstrument();
-    expect(inst.questions[1]).toMatchObject({ type: "likert", reverse: true });
-    expect(await prisma.auditLog.count({ where: { action: "questionnaire.updated" } })).toBe(1);
+    const q = await prisma.questionnaire.findFirstOrThrow({
+      where: { type: "pretest", isActive: true },
+      include: { questions: { orderBy: { order: "asc" } } },
+    });
+    expect(q.isPlaceholder).toBe(false);
+    expect(q.questions.map((x) => [x.order, x.type, x.text])).toEqual([
+      [1, "likert", "Seberapa sering kamu minum minuman manis?"],
+      [2, "likert", "Saya sulit menolak minuman manis."],
+      [3, "choice", "Ukuran gelas favorit?"],
+      [4, "text", "Minuman favoritmu?"],
+    ]);
+    expect(q.questions[3]!.options).toBeNull();
+    expect((await getInstrument("pretest")).questions[1]).toMatchObject({
+      type: "likert",
+      reverse: true,
+    });
+    // Posttest tidak ikut berubah.
+    expect((await getInstrument("posttest")).questions).toEqual(postBefore);
+
+    const posttest = {
+      type: "posttest",
+      questions: [{ type: "text", text: "Kesan?", required: true }],
+    };
+    expect((await call(saveRoute, { cookie, method: "PUT", body: posttest })).status).toBe(200);
+    expect((await getInstrument("posttest")).questions).toEqual([
+      { type: "text", text: "Kesan?", required: true },
+    ]);
+    expect((await getInstrument("pretest")).questions).toHaveLength(4);
+    expect(await prisma.auditLog.count({ where: { action: "questionnaire.updated" } })).toBe(2);
   });
 
   it("skor terbalik: tingkat 1 bernilai 5; nilai jawaban tetap kode 1..5", () => {
@@ -118,17 +132,24 @@ describe("Kuesioner oleh staf (ADR-010)", () => {
       cookie,
       method: "PUT",
       body: {
+        type: "pretest",
         questions: [
           { type: "likert", text: " ", required: true, labels: ["a", "b"], reverse: false },
         ],
       },
     });
     expect(res.status).toBe(422);
+    const noType = await call(saveRoute, {
+      cookie,
+      method: "PUT",
+      body: { questions: INSTRUMENT.questions },
+    });
+    expect(noType.json.error.fields.type).toBeTruthy();
     expect(res.json.error.fields["questions.0.text"]).toBeTruthy();
     expect(res.json.error.fields["questions.0.labels"]).toBeTruthy();
   });
 
-  it("terkunci begitu ada responden yang mulai mengisi", async () => {
+  it("pretest terkunci begitu ada yang mulai mengisi; posttest masih bisa diubah", async () => {
     const cookie = await staff();
     const r = await makeRespondent();
     await prisma.respondent.update({ where: { id: r.id }, data: { consentAt: new Date() } });
@@ -142,10 +163,18 @@ describe("Kuesioner oleh staf (ADR-010)", () => {
     });
     expect(draft.status).toBe(200);
 
-    expect((await getInstrument()).locked).toBe(true);
+    expect((await getInstrument("pretest")).locked).toBe(true);
     const res = await call(saveRoute, { cookie, method: "PUT", body: INSTRUMENT });
     expect(res.status).toBe(422);
     expect(res.json.error.code).toBe("QUESTIONNAIRE_LOCKED");
+
+    expect((await getInstrument("posttest")).locked).toBe(false);
+    const post = await call(saveRoute, {
+      cookie,
+      method: "PUT",
+      body: { ...INSTRUMENT, type: "posttest" },
+    });
+    expect(post.status).toBe(200);
   });
 
   it("hanya staf: responden ditolak", async () => {

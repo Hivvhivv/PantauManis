@@ -147,7 +147,7 @@ Responden memiliki delapan halaman utama: Persetujuan, Pretest, Dashboard, Catat
 FR-R-01 Persetujuan dan pretest
 • Saat login pertama, Responden membaca lembar informasi penelitian dan mencentang persetujuan (informed consent).
 • Pretest wajib diisi sebelum fitur lain terbuka. Jawaban dapat disimpan sebagai draf dan dilanjutkan.
-• Keputusan 2026-10-15 (ADR-010): setelah persetujuan, responden masuk Beranda yang menampilkan tombol "Isi Kuesioner Awal" (atau "Lanjutkan" bila ada draf); fitur lain tetap terkunci sampai pretest dikirim.
+• Keputusan 2026-10-16 (ADR-010): pretest langsung ditampilkan setelah persetujuan. Bila responden keluar ke Beranda sebelum selesai, Beranda menampilkan tombol "Isi Kuesioner Awal" (atau "Lanjutkan"); fitur lain tetap terkunci sampai pretest dikirim.
 • Setelah dikirim, pretest terkunci dan tidak bisa diubah Responden. Hari ke-1 periode dimulai pada tanggal pretest selesai.
 FR-R-02 Pencatatan konsumsi minuman
 • Form berisi: jenis minuman (dropdown: teh manis, kopi susu, boba/milk tea, minuman bersoda, jus kemasan, minuman energi, susu berperisa, lainnya), ukuran (pilihan gelas/botol atau ml), jumlah sajian, tingkat gula (normal/less/no sugar bila relevan), waktu minum, dan catatan opsional.
@@ -432,7 +432,7 @@ Daftar ADR yang perlu dibuat
 7. ADR-007 Format dan skema ekspor data penelitian.
 8. ADR-008 Penyimpanan media edukasi.
 9. ADR-009 Nama lengkap responden dan laporan PDF.
-10. ADR-010 Soal pretest/posttest dikelola staf; pretest lewat tombol di Beranda.
+10. ADR-010 Soal pretest dan posttest dikelola staf secara terpisah.
 13. Pengujian dan Definition of Done
 Setiap fitur diuji di tiga tingkat dan wajib lulus skenario kontrol akses sebelum dinyatakan selesai.
 Lapisan pengujian
@@ -498,7 +498,7 @@ Pertanyaan terbuka
 [x] Apakah kode akses perlu tetap terlihat di List Responden? Ya, disimpan terenkripsi (ADR-004).
 [x] Apakah setiap Admin melihat semua responden? Ya, semua responden.
 [x] Apakah kode akses kedaluwarsa setelah periode penelitian? Tidak; Responden tetap dapat mengakses.
-[ ] Instrumen pretest dan posttest apa yang dipakai (jumlah butir, skala, cara skor)? — Mesin kuesioner sudah ada (Fase 2) dengan butir CONTOH. Sejak 2026-10-15 (ADR-010) butir final diisi staf lewat menu Kuesioner (skala 1–5, pilihan ganda, isian; satu set untuk pretest & posttest), sebelum responden pertama mengisi.
+[ ] Instrumen pretest dan posttest apa yang dipakai (jumlah butir, skala, cara skor)? — Mesin kuesioner sudah ada (Fase 2) dengan butir CONTOH. Sejak 2026-10-15 (ADR-010) butir final diisi staf lewat menu Kuesioner (skala 1–5, pilihan ganda, isian). Sejak 2026-10-16 soal pretest dan posttest terpisah, masing-masing terkunci setelah ada jawaban jenis itu.
 [ ] Sumber nilai gula per jenis minuman untuk tabel referensi. — Menu Admin "Referensi Minuman" sudah ada (Fase 2); 8 jenis awal masih nilai CONTOH bertanda "perlu diverifikasi".
 [x] Apakah pencatatan dikunci setelah posttest? Tidak: responden tetap bisa mencatat setelah hari ke-14; catatan ditandai di luar periode.
 [ ] Teks resmi lembar informasi/persetujuan yang disetujui komite etik (saat ini teks CONTOH di study_settings.consent_text).

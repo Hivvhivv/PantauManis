@@ -6,8 +6,8 @@ import { AuditAction, writeAudit, type Actor } from "@/server/modules/audit";
 import type { QuestionOption } from "./scoring";
 
 /**
- * Pengelolaan soal kuesioner oleh staf (ADR-010). Satu set soal dipakai untuk pretest DAN
- * posttest agar skor bisa dibandingkan; soal dikunci begitu ada responden yang mulai mengisi.
+ * Pengelolaan soal kuesioner oleh staf (ADR-010). Pretest dan posttest punya soal sendiri;
+ * soal satu jenis dikunci begitu ada responden yang mulai mengisi jenis itu.
  */
 
 export const LIKERT_DEFAULT = ["Tidak pernah", "Jarang", "Kadang-kadang", "Sering", "Selalu"];
@@ -41,7 +41,11 @@ const itemSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("text"), text, required: z.boolean() }),
 ]);
 
+export const QUESTIONNAIRE_KINDS = ["pretest", "posttest"] as const;
+export type QuestionnaireKind = (typeof QUESTIONNAIRE_KINDS)[number];
+
 export const instrumentSchema = z.object({
+  type: z.enum(QUESTIONNAIRE_KINDS, { error: "Pilih pretest atau posttest." }),
   questions: z.array(itemSchema).min(1, "Minimal 1 soal.").max(50, "Maksimal 50 soal."),
 });
 export type InstrumentItem = z.infer<typeof itemSchema>;
@@ -86,66 +90,57 @@ function fromQuestion(q: {
   };
 }
 
-async function activePair() {
-  const find = (type: "pretest" | "posttest") =>
-    prisma.questionnaire.findFirst({
-      where: { type, isActive: true },
-      orderBy: { version: "desc" },
-      include: { questions: { orderBy: { order: "asc" } } },
-    });
-  const [pre, post] = await Promise.all([find("pretest"), find("posttest")]);
-  if (!pre || !post) {
-    throw new AppError(503, "QUESTIONNAIRE_UNAVAILABLE", "Kuesioner belum tersedia.");
-  }
-  return { pre, post };
+async function active(type: QuestionnaireKind) {
+  const q = await prisma.questionnaire.findFirst({
+    where: { type, isActive: true },
+    orderBy: { version: "desc" },
+    include: { questions: { orderBy: { order: "asc" } } },
+  });
+  if (!q) throw new AppError(503, "QUESTIONNAIRE_UNAVAILABLE", "Kuesioner belum tersedia.");
+  return q;
 }
 
-/** Soal (diambil dari pretest; posttest selalu salinan yang sama) + status kunci. */
-export async function getInstrument() {
-  const { pre, post } = await activePair();
-  const responses = await prisma.questionnaireResponse.count({
-    where: { questionnaireId: { in: [pre.id, post.id] } },
-  });
+/** Soal satu jenis kuesioner + status kunci (terkunci bila sudah ada jawaban jenis itu). */
+export async function getInstrument(type: QuestionnaireKind) {
+  const q = await active(type);
+  const responses = await prisma.questionnaireResponse.count({ where: { questionnaireId: q.id } });
   return {
-    questions: pre.questions.map(fromQuestion),
-    isPlaceholder: pre.isPlaceholder,
+    questions: q.questions.map(fromQuestion),
+    isPlaceholder: q.isPlaceholder,
     responses,
     locked: responses > 0,
   };
 }
 
-/** Ganti seluruh soal pretest dan posttest. Ditolak bila sudah ada jawaban responden. */
+/** Ganti seluruh soal satu jenis kuesioner. Ditolak bila sudah ada jawaban responden. */
 export async function saveInstrument(input: z.infer<typeof instrumentSchema>, actor: Actor) {
-  const { pre, post } = await activePair();
+  const q = await active(input.type);
   await prisma.$transaction(async (tx) => {
-    const responses = await tx.questionnaireResponse.count({
-      where: { questionnaireId: { in: [pre.id, post.id] } },
-    });
+    // Diperiksa ulang di dalam transaksi agar tidak terlewat jawaban yang baru masuk.
+    const responses = await tx.questionnaireResponse.count({ where: { questionnaireId: q.id } });
     if (responses > 0) {
       throw businessRule(
         "QUESTIONNAIRE_LOCKED",
-        "Soal tidak bisa diubah karena sudah ada responden yang mengisi kuesioner.",
+        "Soal tidak bisa diubah karena sudah ada responden yang mengisi kuesioner ini.",
       );
     }
-    for (const q of [pre, post]) {
-      await tx.question.deleteMany({ where: { questionnaireId: q.id } });
-      await tx.question.createMany({
-        data: input.questions.map((item, i) => ({
-          questionnaireId: q.id,
-          order: i + 1,
-          text: item.text,
-          type: item.type,
-          required: item.required,
-          options: toOptions(item) ?? undefined,
-        })),
-      });
-      await tx.questionnaire.update({ where: { id: q.id }, data: { isPlaceholder: false } });
-    }
+    await tx.question.deleteMany({ where: { questionnaireId: q.id } });
+    await tx.question.createMany({
+      data: input.questions.map((item, i) => ({
+        questionnaireId: q.id,
+        order: i + 1,
+        text: item.text,
+        type: item.type,
+        required: item.required,
+        options: toOptions(item) ?? undefined,
+      })),
+    });
+    await tx.questionnaire.update({ where: { id: q.id }, data: { isPlaceholder: false } });
     await writeAudit(
       {
         actor,
         action: AuditAction.QuestionnaireUpdated,
-        metadata: { questions: input.questions.length },
+        metadata: { type: input.type, questions: input.questions.length },
       },
       tx,
     );

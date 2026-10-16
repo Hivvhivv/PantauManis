@@ -22,13 +22,13 @@ async function questions() {
 }
 
 describe("persetujuan dan pretest (FR-R-01, BR-06, BR-07)", () => {
-  it("alur login pertama: persetujuan → beranda (tombol pretest) → pretest", async () => {
+  it("alur login pertama: persetujuan → pretest → beranda", async () => {
     const { r, res, cookie } = await freshLogin();
     expect(res.json.redirectTo).toBe("/persetujuan");
 
-    // Setelah setuju, responden masuk Beranda yang menampilkan tombol Isi Kuesioner Awal.
+    // Setelah setuju, pretest langsung ditampilkan (ADR-010).
     const c = await call(consent, { cookie, body: { agree: true } });
-    expect(c.json.redirectTo).toBe("/beranda");
+    expect(c.json.redirectTo).toBe("/pretest");
 
     const qs = await questions();
     const answers = Object.fromEntries(

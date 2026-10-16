@@ -30,8 +30,8 @@ Lihat ADR-009.
 
 **Tambahan 2026-10-15 (2):**
 
-- Menu **Kuesioner**: staf membuat soal pretest/posttest (skala 1–5, pilihan ganda, isian; satu set untuk keduanya; terkunci setelah ada jawaban). Lihat ADR-010.
-- Pretest dibuka lewat tombol di Beranda.
+- Menu **Kuesioner**: staf membuat soal pretest dan posttest secara terpisah (skala 1–5, pilihan ganda, isian). Masing-masing terkunci setelah ada jawaban. Lihat ADR-010.
+- Pretest langsung tampil setelah persetujuan. Bila ditinggalkan, Beranda menampilkan tombol untuk melanjutkan.
 - Halaman Edukasi didesain ulang.
 - PantauManis bisa dipasang di layar HP (PWA).
 

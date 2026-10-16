@@ -4,19 +4,21 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, type ApiError } from "@/lib/api-client";
 import { useHydrated } from "@/lib/use-hydrated";
-import type { InstrumentItem } from "@/server/modules/questionnaires/admin";
+import type { InstrumentItem, QuestionnaireKind } from "@/server/modules/questionnaires/admin";
 
 type Item = InstrumentItem & { key: number };
 
 const TYPE_LABEL = { likert: "Skala 1–5", choice: "Pilihan ganda", text: "Isian singkat" };
 let nextKey = 1;
 
-/** Editor soal kuesioner (ADR-010). Disimpan sekaligus untuk pretest dan posttest. */
+/** Editor soal satu jenis kuesioner (pretest atau posttest, ADR-010). */
 export function InstrumentEditor({
+  type,
   initial,
   locked,
   likertDefault,
 }: {
+  type: QuestionnaireKind;
   initial: InstrumentItem[];
   locked: boolean;
   likertDefault: string[];
@@ -63,7 +65,7 @@ export function InstrumentEditor({
     const res = await api("/api/admin/questionnaire", {
       method: "PUT",
       // `key` hanya untuk React; skema zod di server membuang kolom yang tidak dikenal.
-      body: { questions: items },
+      body: { type, questions: items },
     });
     setBusy(false);
     if (!res.ok) return setError(res.error);
@@ -252,7 +254,7 @@ export function InstrumentEditor({
       )}
       {saved && (
         <p className="alert alert-info" role="status">
-          Soal tersimpan untuk pretest dan posttest.
+          Soal {type === "pretest" ? "pretest" : "posttest"} tersimpan.
         </p>
       )}
       {!locked && (
