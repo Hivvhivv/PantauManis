@@ -2747,6 +2747,13 @@ a.edu-card:hover {
   font-weight: 800;
   font-size: 0.8rem;
 }
+.id-tip {
+  margin: 0;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--border);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
 .id-url {
   word-break: break-all;
   font-weight: 700;

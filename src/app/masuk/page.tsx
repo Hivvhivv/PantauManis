@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Disclaimer } from "@/components/Disclaimer";
 import { DrinksIllustration } from "@/components/DrinksIllustration";
+import { InstallCard } from "@/components/InstallCard";
 import { Logo } from "@/components/Logo";
 import { resolveRespondentSession } from "@/server/auth/sessions";
 import { RESPONDENT_COOKIE } from "@/server/http/cookies";
@@ -42,6 +43,7 @@ export default async function MasukPage() {
               Tim peneliti? <Link href="/staf/masuk">Masuk sebagai staf</Link>
             </p>
           </section>
+          <InstallCard />
           <Disclaimer />
         </div>
       </div>

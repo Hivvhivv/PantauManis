@@ -134,6 +134,10 @@ function IdCard({
           </li>
         </ol>
       </div>
+      <p className="id-tip">
+        📲 Pasang di HP: setelah laman terbuka, pilih <strong>Tambahkan ke layar utama</strong> di
+        menu browser.
+      </p>
     </article>
   );
 }
