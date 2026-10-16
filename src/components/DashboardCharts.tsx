@@ -92,12 +92,14 @@ export function SugarLineChart({
             backgroundColor: "rgba(201, 111, 59, 0.12)",
             fill: true,
             tension: 0.35,
+            // Belum diisi = celah (bukan 0). Titik dibuat besar dan terisi agar hari yang
+            // berdiri sendiri (diapit hari Belum diisi) tetap terlihat jelas.
             spanGaps: false,
             borderWidth: 2.5,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            pointBackgroundColor: css("--surface"),
-            pointBorderColor: css("--primary"),
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointBackgroundColor: css("--primary"),
+            pointBorderColor: css("--surface"),
             pointBorderWidth: 2,
           },
           ...targetLine(labels, target),
