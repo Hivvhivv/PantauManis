@@ -7,7 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "PantauManis",
     description: "Catat dan pantau konsumsi minuman manis harianmu.",
     lang: "id",
-    start_url: "/beranda",
+    // "/" memilih tujuan dari sesi yang ada (responden → Beranda, staf → Dashboard Admin).
+    start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#fbf6ee",
