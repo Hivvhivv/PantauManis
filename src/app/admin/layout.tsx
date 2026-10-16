@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Icon } from "@/components/Icon";
+import { AdminNav } from "./AdminNav";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Logo } from "@/components/Logo";
 import { staffForPage } from "@/server/auth/page-guards";
@@ -14,25 +16,27 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <>
       <header className="topbar">
-        <div className="container">
-          <Logo />
-          <nav aria-label="Menu utama">
-            <Link href="/admin">Dashboard</Link>
-            <Link href="/admin/responden">List Responden</Link>
-            <Link href="/admin/referensi-minuman">Referensi Minuman</Link>
-            <Link href="/admin/edukasi">Materi Edukasi</Link>
-            <Link href="/admin/kuesioner">Kuesioner</Link>
-            {isSuper && <Link href="/admin/pengguna">Manajemen Pengguna</Link>}
-            {isSuper && <Link href="/admin/pengaturan">Pengaturan</Link>}
-          </nav>
-          <span className="spacer" />
-          <span className="small muted">
-            {user.name} · {ROLE_LABELS[user.role]}
-          </span>
-          <Link className="btn btn-sm" href="/staf/ganti-kata-sandi">
-            Ganti kata sandi
-          </Link>
-          <LogoutButton kind="staff" />
+        <div className="container topbar-inner">
+          <Logo tagline="Pantau minuman manis harian" />
+          <AdminNav isSuper={isSuper} />
+          <details className="user-menu">
+            <summary>
+              <span className="avatar" aria-hidden="true">
+                {user.name.slice(0, 1).toUpperCase()}
+              </span>
+              <span className="user-menu-text">
+                <strong>{user.name}</strong>
+                <span className="small muted">{ROLE_LABELS[user.role]}</span>
+              </span>
+              <Icon name="chevronDown" size={16} />
+            </summary>
+            <div className="user-menu-panel card stack">
+              <Link className="btn btn-sm" href="/staf/ganti-kata-sandi">
+                <Icon name="key" size={16} /> Ganti kata sandi
+              </Link>
+              <LogoutButton kind="staff" />
+            </div>
+          </details>
         </div>
       </header>
       <main className="container stack">

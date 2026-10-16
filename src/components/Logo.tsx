@@ -1,5 +1,14 @@
 /** Logo PantauManis: tetesan karamel dengan daun. */
-export function Logo({ size = 28, withText = true }: { size?: number; withText?: boolean }) {
+export function Logo({
+  size = 28,
+  withText = true,
+  tagline,
+}: {
+  size?: number;
+  withText?: boolean;
+  /** Baris kecil di bawah nama (navbar staf, kartu kode). Hindari klaim kesehatan. */
+  tagline?: string;
+}) {
   return (
     <span className="logo">
       <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
@@ -14,7 +23,15 @@ export function Logo({ size = 28, withText = true }: { size?: number; withText?:
         />
         <path d="M19 6.5c2.8-2.8 6.5-3 8.5-2.5-.4 2.6-2.4 5.8-6.4 6.2" fill="var(--accent)" />
       </svg>
-      {withText && <span className="logo-text">PantauManis</span>}
+      {withText &&
+        (tagline ? (
+          <span className="logo-stack">
+            <span className="logo-text">PantauManis</span>
+            <span className="logo-tagline">{tagline}</span>
+          </span>
+        ) : (
+          <span className="logo-text">PantauManis</span>
+        ))}
     </span>
   );
 }
