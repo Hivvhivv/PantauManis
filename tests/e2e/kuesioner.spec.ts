@@ -33,6 +33,17 @@ test("PWA dibuka ulang: sesi staf → Admin, tanpa sesi → Masuk", async ({ pag
   await expect(page).toHaveURL(/\/admin$/);
 });
 
+test("PWA: kartu Pasang tampil di halaman masuk dan bisa ditutup", async ({ page }) => {
+  await page.goto("/masuk");
+  const card = page.getByRole("region", { name: "Pasang PantauManis di HP" });
+  await expect(card).toBeVisible();
+  await expect(card.getByText(/Tambahkan ke layar utama/)).toBeVisible();
+  await card.getByRole("button", { name: "Nanti saja" }).click();
+  await expect(card).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("region", { name: "Pasang PantauManis di HP" })).toHaveCount(0);
+});
+
 test("PWA: manifest dan ikon tersedia", async ({ request }) => {
   const m = await request.get("/manifest.webmanifest");
   expect(m.ok()).toBe(true);

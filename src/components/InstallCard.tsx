@@ -6,12 +6,13 @@ type InstallPrompt = Event & { prompt: () => Promise<void> };
 const DISMISS_KEY = "pm-install-dismissed";
 
 /**
- * Kartu "Pasang di HP" (PWA). Android/Chrome: tombol Pasang memakai dialog bawaan browser.
- * iPhone: petunjuk Bagikan → Tambah ke Layar Utama. Tidak tampil bila sudah terpasang
- * atau pernah ditutup.
+ * Kartu "Pasang di HP" (PWA). Selalu tampil dengan petunjuk manual, karena Chrome baru
+ * mengirim `beforeinstallprompt` setelah pengunjung berinteraksi beberapa saat (dan browser
+ * dalam aplikasi seperti WhatsApp tidak pernah mengirimnya). Begitu event itu datang,
+ * tombol Pasang satu-ketuk ditampilkan. Tidak tampil bila sudah terpasang atau pernah ditutup.
  */
 export function InstallCard() {
-  const [mode, setMode] = useState<"hidden" | "prompt" | "ios">("hidden");
+  const [mode, setMode] = useState<"hidden" | "prompt" | "ios" | "manual">("hidden");
   const [prompt, setPrompt] = useState<InstallPrompt | null>(null);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export function InstallCard() {
       setMode("ios");
       return;
     }
+    setMode("manual");
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setPrompt(e as InstallPrompt);
@@ -61,8 +63,13 @@ export function InstallCard() {
               Ketuk tombol <strong>Bagikan</strong> ⬆ di Safari, lalu pilih{" "}
               <strong>Tambah ke Layar Utama</strong>.
             </>
-          ) : (
+          ) : mode === "prompt" ? (
             "Buka langsung dari layar utama seperti aplikasi, tanpa mengetik alamat."
+          ) : (
+            <>
+              Buka di <strong>Chrome</strong>, ketuk menu <strong>⋮</strong>, lalu pilih{" "}
+              <strong>Tambahkan ke layar utama</strong> atau <strong>Instal aplikasi</strong>.
+            </>
           )}
         </p>
       </div>
