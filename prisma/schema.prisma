@@ -92,6 +92,7 @@ model Respondent {
   responses       QuestionnaireResponse[]
   goals           Goal[]
   educationProgress EducationProgress[]
+  pushSubscriptions PushSubscription[]
 
   @@index([deletedAt, accessStatus])
   @@map("respondents")
@@ -454,4 +455,22 @@ model EducationProgress {
 
   @@unique([respondentId, materialId])
   @@map("education_progress")
+}
+
+/// Langganan Web Push per perangkat responden (ADR-011). Hanya alamat langganan dari browser,
+/// tanpa data pribadi. Dihapus saat responden mematikan pengingat atau layanan push menolaknya.
+model PushSubscription {
+  id           String    @id @default(uuid()) @db.Uuid
+  respondentId String    @map("respondent_id") @db.Uuid
+  endpoint     String    @unique
+  p256dh       String
+  auth         String
+  userAgent    String?   @map("user_agent") @db.VarChar(300)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastSentAt   DateTime? @map("last_sent_at") @db.Timestamptz(3)
+
+  respondent Respondent @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+
+  @@index([respondentId])
+  @@map("push_subscriptions")
 }

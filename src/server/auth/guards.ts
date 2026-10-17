@@ -1,4 +1,5 @@
 import "server-only";
+import { timingSafeEqual } from "node:crypto";
 import type { Respondent, StaffRole, StaffUser } from "@/generated/prisma/client";
 import { AppError, forbidden, unauthenticated } from "@/server/http/errors";
 import { readCookie, RESPONDENT_COOKIE, STAFF_COOKIE } from "@/server/http/cookies";
@@ -31,6 +32,19 @@ export async function requireStaff(
 }
 
 export const requireSuperadmin = (req: Request) => requireStaff(req, ["superadmin"]);
+
+/**
+ * Guard untuk jadwal otomatis (Vercel Cron). Vercel mengirim `Authorization: Bearer
+ * <CRON_SECRET>`; tanpa secret di server, endpoint selalu ditolak.
+ */
+export function requireCron(req: Request) {
+  const secret = process.env.CRON_SECRET;
+  const got = req.headers.get("authorization") ?? "";
+  const want = `Bearer ${secret}`;
+  const ok =
+    !!secret && got.length === want.length && timingSafeEqual(Buffer.from(got), Buffer.from(want));
+  if (!ok) throw unauthenticated();
+}
 
 /** Guard responden. respondent_id selalu diambil dari sesi, bukan dari URL (BR-09). */
 export async function requireRespondent(req: Request): Promise<Respondent> {

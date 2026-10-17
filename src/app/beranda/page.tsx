@@ -6,6 +6,8 @@ import { Disclaimer } from "@/components/Disclaimer";
 import { DrinksIllustration } from "@/components/DrinksIllustration";
 import { Icon } from "@/components/Icon";
 import { InstallCard } from "@/components/InstallCard";
+import { ReminderToggle } from "@/components/ReminderToggle";
+import { vapidPublicKey } from "@/server/modules/reminders/service";
 import { RespondentShell } from "@/components/RespondentShell";
 import { ZeroDayButton } from "@/components/ZeroDayButton";
 import { formatLocalDate } from "@/lib/format";
@@ -78,6 +80,7 @@ export default async function BerandaPage({
   const resp = await respondentAtStage("home");
   if (!resp.dayOneDate) return <PretestGate id={resp.id} label={resp.label} />;
   const r = resp as ReadyRespondent;
+  const vapidKey = vapidPublicKey();
   const sp = await searchParams;
   const range: RangeKey =
     typeof sp.range === "string" && sp.range in RANGES ? (sp.range as RangeKey) : "2w";
@@ -116,6 +119,7 @@ export default async function BerandaPage({
       )}
 
       <InstallCard />
+      {vapidKey && <ReminderToggle vapidKey={vapidKey} />}
 
       {pt.state === "open" && (
         <Link className="reminder" href="/posttest">

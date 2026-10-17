@@ -35,6 +35,8 @@ Lihat ADR-009.
 - Halaman Edukasi didesain ulang.
 - PantauManis bisa dipasang di layar HP (PWA).
 
+**Tambahan 2026-10-17:** pengingat harian lewat Web Push pukul 19.00 WIB, hanya untuk responden yang hari itu belum mencatat, ditambah pengingat posttest. Pengingat dinyalakan sendiri oleh responden di Beranda. Lihat ADR-011 dan bagian Web Push di runbook deploy.
+
 Langkah selanjutnya: jalankan pilot 3–5 responden mengikuti runbook di atas.
 
 ## Menjalankan secara lokal

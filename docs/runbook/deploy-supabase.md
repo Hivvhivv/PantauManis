@@ -77,3 +77,16 @@ Atur di dashboard hosting, bukan di repositori:
 4. Uji: buka **Materi Edukasi → Tambah materi**, unggah gambar kecil, lalu pastikan pratinjau tampil dan URL gambar mengarah ke `<project>.supabase.co/storage/v1/object/public/edukasi/...`.
 
 Tanpa `STORAGE_DRIVER=supabase`, aplikasi memakai folder lokal (cocok untuk dev, **tidak** untuk hosting serverless karena file hilang saat redeploy).
+
+## Pengingat harian / Web Push (ADR-011)
+
+1. Buat pasangan kunci VAPID **sekali** untuk production: `npx web-push generate-vapid-keys`. Jangan diganti selama penelitian, karena mengganti kunci membatalkan semua langganan responden.
+2. Isi env di Vercel, lalu **Redeploy**:
+   ```dotenv
+   VAPID_PUBLIC_KEY="<public key>"
+   VAPID_PRIVATE_KEY="<private key>"   # rahasia
+   VAPID_SUBJECT="mailto:peneliti@kampus.ac.id"
+   CRON_SECRET="<acak, mis. dari: node -e \"console.log(require('crypto').randomBytes(24).toString('base64url'))\">"
+   ```
+3. Jadwal ada di `vercel.json` (`0 12 * * *` UTC = 19.00 WIB). Cek di Vercel → **Settings → Cron Jobs**. Vercel otomatis mengirim `Authorization: Bearer <CRON_SECRET>`.
+4. Uji: di HP Android (Chrome), buka Beranda sebagai responden yang sudah pretest dan belum mencatat hari ini, lalu ketuk **Nyalakan pengingat**. Di Vercel → Cron Jobs, klik **Run** pada `/api/cron/reminders`; notifikasi harus muncul. Ringkasan pengiriman tercatat di `audit_logs` (`reminders.sent`).

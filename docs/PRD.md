@@ -27,7 +27,7 @@ Termasuk dalam lingkup
 • Ekspor data penelitian dan log audit aktivitas admin.
 Di luar lingkup v1
 • Aplikasi mobile native (cukup web responsif).
-• Notifikasi push/WhatsApp (bisa dipertimbangkan di fase berikutnya).
+• Notifikasi WhatsApp/email. (Keputusan 2026-10-17, ADR-011: pengingat harian lewat Web Push masuk lingkup: pukul 19.00 WIB, hanya bila hari itu Belum diisi, ditambah pengingat posttest; dinyalakan sendiri oleh responden.)
 • Integrasi dengan perangkat atau aplikasi kesehatan lain.
 • Multi-studi atau multi-gelombang penelitian secara bersamaan.
 Batasan etis (wajib tampil di website)
@@ -433,6 +433,7 @@ Daftar ADR yang perlu dibuat
 8. ADR-008 Penyimpanan media edukasi.
 9. ADR-009 Nama lengkap responden dan laporan PDF.
 10. ADR-010 Soal pretest dan posttest dikelola staf secara terpisah.
+11. ADR-011 Pengingat harian lewat Web Push.
 13. Pengujian dan Definition of Done
 Setiap fitur diuji di tiga tingkat dan wajib lulus skenario kontrol akses sebelum dinyatakan selesai.
 Lapisan pengujian
@@ -502,5 +503,5 @@ Pertanyaan terbuka
 [ ] Sumber nilai gula per jenis minuman untuk tabel referensi. — Menu Admin "Referensi Minuman" sudah ada (Fase 2); 8 jenis awal masih nilai CONTOH bertanda "perlu diverifikasi".
 [x] Apakah pencatatan dikunci setelah posttest? Tidak: responden tetap bisa mencatat setelah hari ke-14; catatan ditandai di luar periode.
 [ ] Teks resmi lembar informasi/persetujuan yang disetujui komite etik (saat ini teks CONTOH di study_settings.consent_text).
-[ ] Apakah dibutuhkan pengingat harian (email/WhatsApp) di fase berikutnya?
+[x] Apakah dibutuhkan pengingat harian? Ya, lewat Web Push (ADR-011), bukan email/WhatsApp.
 [ ] Ketentuan komite etik tentang lokasi server, masa simpan data, dan penghapusan data setelah penelitian.

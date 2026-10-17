@@ -6,6 +6,7 @@ import { execSync, spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { hash } from "@node-rs/argon2";
 import { PrismaPg } from "@prisma/adapter-pg";
+import webpush from "web-push";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { migrateDeploy, startEmbeddedPostgres } from "./lib/embedded-pg";
 
@@ -48,6 +49,8 @@ async function main() {
     APP_URL: "http://localhost:3100",
     ACCESS_CODE_HMAC_SECRET: randomBytes(32).toString("base64"),
     ACCESS_CODE_ENC_KEY: randomBytes(32).toString("base64"),
+    // Kunci VAPID uji agar tombol pengingat (ADR-011) tampil; tidak ada notifikasi yang dikirim.
+    VAPID_PUBLIC_KEY: webpush.generateVAPIDKeys().publicKey,
     // Build produksi: tanpa kompilasi per halaman seperti `next dev`, jadi waktu test stabil.
     // Folder build terpisah (.next-e2e) agar tidak bentrok dengan `npm run dev`.
     NEXT_DIST_DIR: ".next-e2e",
