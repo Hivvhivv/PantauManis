@@ -9,6 +9,7 @@ import { Logo } from "@/components/Logo";
 import { resolveRespondentSession } from "@/server/auth/sessions";
 import { RESPONDENT_COOKIE } from "@/server/http/cookies";
 import { respondentHomePath } from "@/server/modules/auth-service";
+import { getStudySettings } from "@/server/modules/study/settings";
 import { RespondentLoginForm } from "./RespondentLoginForm";
 
 export const metadata: Metadata = { title: "Masuk" };
@@ -16,6 +17,7 @@ export const metadata: Metadata = { title: "Masuk" };
 export default async function MasukPage() {
   const r = await resolveRespondentSession((await cookies()).get(RESPONDENT_COOKIE)?.value);
   if (r) redirect(respondentHomePath(r));
+  const { contactText } = await getStudySettings();
 
   return (
     <main className="auth-page">
@@ -38,6 +40,16 @@ export default async function MasukPage() {
               </p>
             </div>
             <RespondentLoginForm />
+            <p className="small muted help-contact" style={{ margin: 0 }}>
+              Lupa kode akses?{" "}
+              {contactText ? (
+                <>
+                  Hubungi tim peneliti: <strong>{contactText}</strong>
+                </>
+              ) : (
+                "Hubungi tim peneliti yang memberimu kartu kode."
+              )}
+            </p>
             <div className="divider">atau</div>
             <p className="switch-link" style={{ margin: 0 }}>
               Tim peneliti? <Link href="/staf/masuk">Masuk sebagai staf</Link>

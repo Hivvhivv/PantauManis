@@ -54,6 +54,8 @@ test("alur Admin (PRD 13): buat kode → detail → lihat hasil → ekspor", asy
 
   // List Responden → Ekspor PDF → XLSX data analisis
   await page.getByRole("link", { name: "List Responden" }).first().click();
+  // Tunggu halaman List termuat; tanpa ini klik bisa mengenai menu Ekspor PDF halaman Detail.
+  await expect(page).toHaveURL(/\/admin\/responden$/);
   await page.getByText("Ekspor PDF").click();
   const all = page.waitForEvent("download");
   await page.getByRole("link", { name: "Unduh XLSX (data analisis)" }).click();

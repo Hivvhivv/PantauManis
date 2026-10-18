@@ -35,6 +35,8 @@ test("PWA dibuka ulang: sesi staf → Admin, tanpa sesi → Masuk", async ({ pag
 
 test("PWA: kartu Pasang tampil di halaman masuk dan bisa ditutup", async ({ page }) => {
   await page.goto("/masuk");
+  // Kontak bantuan (Pengaturan → contactText); tanpa isian tampil teks umum.
+  await expect(page.getByText(/Lupa kode akses\?/)).toBeVisible();
   const card = page.getByRole("region", { name: "Pasang PantauManis di HP" });
   await expect(card).toBeVisible();
   // Tombol Pasang selalu ada; tanpa dialog bawaan Chrome, tombol menampilkan langkah manual.

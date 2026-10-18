@@ -13,6 +13,7 @@ type Settings = {
   sugarFactorLess: number;
   sugarFactorNone: number;
   consentText: string;
+  contactText: string;
 };
 
 export function SettingsForm({ initial }: { initial: Settings }) {
@@ -112,6 +113,23 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             required
           />
           <FieldError error={error} name="consentText" />
+        </div>
+
+        <h2 style={{ margin: "0.5rem 0 0" }}>Kontak bantuan untuk responden</h2>
+        <div>
+          <label htmlFor="contactText">
+            Tampil di halaman masuk sebagai &ldquo;Lupa kode akses? Hubungi tim peneliti: …&rdquo;{" "}
+            <span className="hint">opsional, maks. 300 karakter; kosongkan untuk teks umum</span>
+          </label>
+          <input
+            id="contactText"
+            name="contactText"
+            defaultValue={initial.contactText}
+            maxLength={300}
+            placeholder="mis. WhatsApp Tim Peneliti 0812-0000-0000 (Inof)"
+            aria-invalid={error?.fields.contactText ? true : undefined}
+          />
+          <FieldError error={error} name="contactText" />
         </div>
 
         {error && Object.keys(error.fields).length === 0 && (

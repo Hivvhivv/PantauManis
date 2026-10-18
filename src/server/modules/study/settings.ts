@@ -7,6 +7,8 @@ export type StudySettings = {
   backfillDays: number;
   sugarFactors: { less: number; none: number };
   consentText: string;
+  /** Kontak tim peneliti untuk responden yang lupa kode akses; kosong = tidak ditampilkan. */
+  contactText: string;
 };
 
 const num = (v: string | undefined, fallback: number) => {
@@ -27,5 +29,6 @@ export async function getStudySettings(): Promise<StudySettings> {
       none: num(m.get("sugar_factor_none"), 0),
     },
     consentText: m.get("consent_text") ?? "",
+    contactText: m.get("contact_text") ?? "",
   };
 }

@@ -24,6 +24,8 @@ export const settingsSchema = z.object({
     .trim()
     .min(20, "Teks persetujuan terlalu pendek.")
     .max(20000, "Maksimal 20.000 karakter."),
+  /** Tampil di halaman masuk responden: "Lupa kode akses? Hubungi …". Boleh kosong. */
+  contactText: z.string().trim().max(300, "Maksimal 300 karakter.").default(""),
 });
 type SettingsInput = z.infer<typeof settingsSchema>;
 
@@ -34,6 +36,7 @@ const KEYS: Record<keyof SettingsInput, string> = {
   sugarFactorLess: "sugar_factor_less",
   sugarFactorNone: "sugar_factor_none",
   consentText: "consent_text",
+  contactText: "contact_text",
 };
 
 export async function getSettingsForm(): Promise<SettingsInput> {
@@ -45,6 +48,7 @@ export async function getSettingsForm(): Promise<SettingsInput> {
     sugarFactorLess: s.sugarFactors.less,
     sugarFactorNone: s.sugarFactors.none,
     consentText: s.consentText,
+    contactText: s.contactText,
   };
 }
 

@@ -250,6 +250,10 @@ describe("Pengaturan Penelitian (FR-S-04)", () => {
     for (const s of original) {
       await prisma.studySetting.update({ where: { key: s.key }, data: { value: s.value } });
     }
+    // Kunci yang baru dibuat oleh test (mis. contact_text) dihapus lagi.
+    await prisma.studySetting.deleteMany({
+      where: { key: { notIn: original.map((s) => s.key) } },
+    });
   });
 
   const body = (extra: Record<string, unknown> = {}) => ({
@@ -277,6 +281,19 @@ describe("Pengaturan Penelitian (FR-S-04)", () => {
     expect(now.consentText).toContain("komite etik");
     const log = await prisma.auditLog.findFirstOrThrow({ where: { action: "settings.updated" } });
     expect(JSON.stringify(log.metadata)).not.toContain("komite etik");
+  });
+
+  it("kontak bantuan: tersimpan, boleh dikosongkan, maksimal 300 karakter", async () => {
+    const cookie = await staffCookie((await makeStaff("superadmin")).id);
+    const save = (contactText: string) =>
+      call(settings.PUT, { method: "PUT", cookie, body: body({ contactText }) });
+    expect((await save("  WhatsApp Tim Peneliti 0812-0000-0000  ")).status).toBe(200);
+    expect((await getStudySettings()).contactText).toBe("WhatsApp Tim Peneliti 0812-0000-0000");
+    expect((await save("")).status).toBe(200);
+    expect((await getStudySettings()).contactText).toBe("");
+    const tooLong = await save("x".repeat(301));
+    expect(tooLong.status).toBe(422);
+    expect(tooLong.json.error.fields.contactText).toBeTruthy();
   });
 
   it("validasi nilai dan hanya Superadmin", async () => {
