@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, type ApiError } from "@/lib/api-client";
 import { useHydrated } from "@/lib/use-hydrated";
@@ -61,7 +61,6 @@ export function LogForm({
 }: Props) {
   const hydrated = useHydrated();
   const router = useRouter();
-  const searchRef = useRef<HTMLInputElement>(null);
   const [v, setV] = useState(initial);
   const [date, setDate] = useState(initial.consumedAt.slice(0, 10));
   const [time, setTime] = useState(initial.consumedAt.slice(11, 16));
@@ -157,7 +156,6 @@ export function LogForm({
               <Icon name="search" size={18} />
               <input
                 id="bev-search"
-                ref={searchRef}
                 type="search"
                 placeholder="Cari minuman…"
                 value={query}
@@ -274,27 +272,6 @@ export function LogForm({
                 <h2 id="step2-h">Isi detail minuman</h2>
                 <p className="small muted">Masukkan informasi sesuai minuman yang kamu minum.</p>
               </div>
-            </div>
-
-            <div className="selected-bev">
-              <span className="sel-icon" aria-hidden="true">
-                {bev?.icon ?? "🥤"}
-              </span>
-              <div>
-                <strong>{bev?.name ?? "Belum memilih minuman"}</strong>
-                <div className="small muted">
-                  {bev ? "Jenis minuman" : "Pilih jenis minuman di langkah 1"}
-                </div>
-              </div>
-              {bev && (
-                <button
-                  type="button"
-                  className="btn btn-sm"
-                  onClick={() => searchRef.current?.focus()}
-                >
-                  Ubah
-                </button>
-              )}
             </div>
 
             <fieldset>
