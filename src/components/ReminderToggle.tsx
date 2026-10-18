@@ -34,7 +34,12 @@ export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
     if (!supported) return setState(ios && !standalone ? "ios-install" : "unsupported");
     if (Notification.permission === "denied") return setState("denied");
     currentSubscription()
-      .then((s) => setState(s ? "on" : "off"))
+      .then(async (s) => {
+        setState(s ? "on" : "off");
+        // Sinkron ulang ke server: langganan di browser bisa ada tanpa tercatat di server
+        // (mis. koneksi putus saat menyalakan). Penyimpanan bersifat upsert, aman diulang.
+        if (s) await api("/api/respondent/push", { body: s.toJSON() });
+      })
       .catch(() => setState("off"));
   }, []);
 
@@ -85,13 +90,13 @@ export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
   return (
     <section className="install-card" aria-label="Pengingat harian">
       <span className="install-emoji" aria-hidden="true">
-        🔔
+        ðŸ””
       </span>
       <div>
         <strong>Pengingat harian {state === "on" && "aktif"}</strong>
         <p className="small" style={{ margin: "0.15rem 0 0" }}>
           {state === "ios-install"
-            ? "Di iPhone, pasang PantauManis di layar utama dulu (Bagikan ⬆ → Tambah ke Layar Utama), lalu buka dari ikonnya untuk menyalakan pengingat."
+            ? "Di iPhone, pasang PantauManis di layar utama dulu (Bagikan â¬† â†’ Tambah ke Layar Utama), lalu buka dari ikonnya untuk menyalakan pengingat."
             : state === "denied"
               ? "Notifikasi diblokir di browser ini. Izinkan notifikasi untuk PantauManis di pengaturan browser bila ingin diingatkan."
               : state === "on"
