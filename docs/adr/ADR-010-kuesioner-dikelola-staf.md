@@ -44,6 +44,7 @@ Semula butir kuesioner final akan dimasukkan lewat migration oleh pengembang. Pe
    - Halaman pretest punya tautan "Kembali ke Beranda". Beranda tanpa `day_one_date` menampilkan tombol "Isi Kuesioner Awal" (atau "Lanjutkan … (x/n)") dan daftar fitur yang masih terkunci.
    - Halaman dan endpoint lain tetap menolak atau mengalihkan responden yang belum pretest. Hari ke-1 = tanggal pretest dikirim (BR-01).
 8. Setiap penyimpanan soal dicatat di `audit_logs` (`questionnaire.updated`, metadata `type`).
+9. **Cadangan (2026-10-18):** `questionAverages(type)` di `src/server/modules/questionnaires/stats.ts` menghitung rata-rata skor dan n per soal dari seluruh responden. Hanya jawaban terkirim yang dihitung; responden yang dihapus dan soal isian dilewati. Fungsi ini sengaja **belum dipanggil** halaman atau endpoint mana pun, sehingga tidak tampil di aplikasi. Tetap diuji agar siap dipakai bila diperlukan.
 
 ## Alternatif yang dipertimbangkan
 
