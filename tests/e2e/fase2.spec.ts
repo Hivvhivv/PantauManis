@@ -71,11 +71,16 @@ test("alur Responden: kode → persetujuan → pretest → catat → beranda →
     .click();
   await expect(page.getByText(/2 porsi · 500 ml/)).toBeVisible();
 
-  // Hapus catatan → hari kembali Belum diisi → tandai Nol.
-  await page.getByRole("link", { name: /Ubah catatan Teh manis/ }).click();
+  // Menu ⋯: Ubah catatan / Hapus catatan. Hapus → hari kembali Belum diisi → tandai Nol.
+  await page.getByText("⋯", { exact: true }).first().click();
+  await expect(page.getByRole("menuitem", { name: /Ubah catatan/ })).toHaveAttribute(
+    "href",
+    /\/catat\/[0-9a-f-]{36}$/,
+  );
   page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "Hapus catatan" }).click();
+  await page.getByRole("menuitem", { name: /Hapus catatan/ }).click();
   await expect(page).toHaveURL(/\/riwayat$/);
+  await expect(page.getByText(/2 porsi · 500 ml/)).toHaveCount(0);
   await page.getByRole("button", { name: /Tidak minum minuman manis di hari ini/ }).click();
   await expect(page.getByText("0 Nol (tidak minum)").first()).toBeVisible();
 

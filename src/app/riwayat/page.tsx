@@ -6,6 +6,7 @@ import { DrinksIllustration } from "@/components/DrinksIllustration";
 import { Icon } from "@/components/Icon";
 import { RespondentShell } from "@/components/RespondentShell";
 import { ZeroDayButton } from "@/components/ZeroDayButton";
+import { LogMenu } from "./LogMenu";
 import { categoryColor } from "@/lib/palette";
 import { respondentAtStage } from "@/server/auth/page-guards";
 import { listBeverageTypes } from "@/server/modules/beverages/service";
@@ -223,14 +224,7 @@ export default async function RiwayatPage({
                       <span className="small muted">{l.time}</span>
                     </span>
                     {d.editable ? (
-                      <Link
-                        className="kebab"
-                        href={`/catat/${l.id}`}
-                        aria-label={`Ubah catatan ${l.beverage} pukul ${l.time}`}
-                        title="Ubah catatan"
-                      >
-                        ⋯
-                      </Link>
+                      <LogMenu id={l.id} label={`${l.beverage} pukul ${l.time}`} />
                     ) : (
                       <span />
                     )}

@@ -2099,9 +2099,15 @@ a.edu-card:hover {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
-  overflow: hidden;
 }
-.day-group summary {
+/* Tanpa overflow: hidden agar menu ⋯ catatan tidak terpotong; sudut dibulatkan di judul. */
+.day-group > summary {
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+}
+.day-group:not([open]) > summary {
+  border-radius: calc(var(--radius) - 1px);
+}
+.day-group > summary {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 0.35rem 0.75rem;
@@ -2112,7 +2118,7 @@ a.edu-card:hover {
   cursor: pointer;
   list-style: none;
 }
-.day-group summary::-webkit-details-marker {
+.day-group > summary::-webkit-details-marker {
   display: none;
 }
 .day-group .day-title strong {
@@ -2137,7 +2143,7 @@ a.edu-card:hover {
   margin-inline: 0.25rem;
 }
 @media (min-width: 720px) {
-  .day-group summary {
+  .day-group > summary {
     grid-template-columns: auto 1fr auto auto;
   }
   .day-group .day-meta {
@@ -2176,6 +2182,59 @@ a.edu-card:hover {
 .kebab:hover {
   background: var(--bg-soft);
   color: var(--text);
+}
+.log-menu {
+  position: relative;
+}
+.log-menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.log-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.log-menu[open] > summary {
+  background: var(--bg-soft);
+  color: var(--text);
+}
+.log-menu-panel {
+  position: absolute;
+  right: 0;
+  z-index: 25;
+  display: grid;
+  min-width: 190px;
+  margin-top: 0.25rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.log-menu-panel a,
+.log-menu-panel button {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.log-menu-panel a:hover,
+.log-menu-panel button:hover {
+  background: var(--bg-soft);
+}
+.log-menu-panel .danger {
+  color: var(--danger);
+}
+.log-menu-panel .field-error {
+  margin: 0.25rem 0.5rem;
 }
 .day-note {
   display: grid;
