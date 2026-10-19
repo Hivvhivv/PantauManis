@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { dismiss, isDismissed } from "@/lib/dismiss";
 
-type InstallPrompt = Event & { prompt: () => Promise<void> };
-const DISMISS_KEY = "pm-install-dismissed";
+type InstallPrompt = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
 
 /**
  * Kartu "Pasang di HP" (PWA) dengan tombol Pasang yang selalu ada. Chrome baru mengirim
  * `beforeinstallprompt` setelah pengunjung berinteraksi beberapa saat (browser dalam aplikasi
  * seperti WhatsApp tidak pernah mengirimnya): bila event sudah datang, tombol membuka dialog
- * pasang bawaan; bila belum, tombol menampilkan langkah manual. Tidak tampil bila sudah
- * terpasang atau pernah ditutup.
+ * pasang bawaan; bila belum, tombol menampilkan langkah manual.
+ * Tidak tampil bila aplikasi sudah terpasang atau "Nanti saja" ditekan (sampai login berikutnya).
  */
 export function InstallCard() {
   const [mode, setMode] = useState<"hidden" | "prompt" | "ios" | "manual">("hidden");
@@ -18,11 +21,7 @@ export function InstallCard() {
   const [showSteps, setShowSteps] = useState(false);
 
   useEffect(() => {
-    try {
-      if (localStorage.getItem(DISMISS_KEY)) return;
-    } catch {
-      // Penyimpanan diblokir: tetap tampilkan kartu.
-    }
+    if (isDismissed("install") || isDismissed("installed")) return;
     const standalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone;
@@ -37,18 +36,23 @@ export function InstallCard() {
       setPrompt(e as InstallPrompt);
       setMode("prompt");
     };
+    // Terpasang (dari kartu ini atau menu browser): kartu tidak perlu tampil lagi.
+    const onInstalled = () => {
+      dismiss("installed");
+      setMode("hidden");
+    };
     window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
   }, []);
 
   if (mode === "hidden") return null;
 
-  const dismiss = () => {
-    try {
-      localStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      // abaikan
-    }
+  const close = () => {
+    dismiss("install");
     setMode("hidden");
   };
 
@@ -99,7 +103,12 @@ export function InstallCard() {
           onClick={async () => {
             if (prompt) {
               await prompt.prompt();
-              setMode("hidden");
+              const { outcome } = await prompt.userChoice;
+              // Dipasang → hilang selamanya; dibatalkan → disembunyikan sampai login berikutnya.
+              if (outcome === "accepted") {
+                dismiss("installed");
+                setMode("hidden");
+              } else close();
             } else {
               setShowSteps((s) => !s);
             }
@@ -107,8 +116,8 @@ export function InstallCard() {
         >
           Pasang
         </button>
-        <button type="button" className="btn btn-sm" onClick={dismiss}>
-          Nanti saja
+        <button type="button" className="btn btn-sm" onClick={close}>
+          {showSteps ? "Tutup" : "Nanti saja"}
         </button>
       </div>
     </section>

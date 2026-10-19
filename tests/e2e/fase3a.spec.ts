@@ -60,6 +60,11 @@ test("Beranda: kartu Pengingat harian tampil (ADR-011)", async ({ page, request 
   // Chromium headless selalu memblokir notifikasi, jadi kartu di sini menampilkan petunjuk
   // "diblokir"; di browser biasa kartu menampilkan tombol "Nyalakan pengingat" (jam 19.00).
   await expect(card.getByText(/19\.00 WIB|diblokir/)).toBeVisible();
+  // "Nanti saja" menyembunyikan kartu sampai login berikutnya.
+  await card.getByRole("button", { name: "Nanti saja" }).click();
+  await expect(card).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("region", { name: "Pengingat harian" })).toHaveCount(0);
 });
 
 test("AC-04/AC-05: hasil responden hanya diambil saat tombol diklik", async ({

@@ -42,7 +42,8 @@ test("PWA: kartu Pasang tampil di halaman masuk dan bisa ditutup", async ({ page
   // Tombol Pasang selalu ada; tanpa dialog bawaan Chrome, tombol menampilkan langkah manual.
   await card.getByRole("button", { name: "Pasang" }).click();
   await expect(card.getByText(/Tambahkan ke layar utama/)).toBeVisible();
-  await card.getByRole("button", { name: "Nanti saja" }).click();
+  // Saat petunjuk terbuka, tombol "Nanti saja" berlabel "Tutup"; keduanya menyembunyikan kartu.
+  await card.getByRole("button", { name: "Tutup" }).click();
   await expect(card).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole("region", { name: "Pasang PantauManis di HP" })).toHaveCount(0);

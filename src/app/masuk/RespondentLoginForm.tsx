@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api-client";
+import { clearDismissals } from "@/lib/dismiss";
 import { useHydrated } from "@/lib/use-hydrated";
 
 export function RespondentLoginForm() {
@@ -16,6 +17,7 @@ export function RespondentLoginForm() {
     setError(null);
     const res = await api<{ redirectTo: string }>("/api/auth/respondent/login", { body: { code } });
     if (res.ok) {
+      clearDismissals(); // kartu Pasang/Pengingat muncul lagi bila belum dilakukan
       window.location.assign(res.data.redirectTo);
       return;
     }

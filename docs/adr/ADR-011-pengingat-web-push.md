@@ -17,7 +17,9 @@ Tanpa layanan berbayar (email/WhatsApp), dan tanpa aplikasi native.
 ## Keputusan
 
 1. **Web Push standar** (VAPID) dengan library `web-push`. Service worker `public/sw.js` hanya menangani `push` dan `notificationclick`. Service worker itu **tidak** punya handler `fetch`, sehingga halaman, unduhan, dan sesi tidak pernah dicegat atau di-cache.
-2. **Langganan dinyalakan sendiri oleh responden** di Beranda (kartu "Pengingat harian", tombol Nyalakan/Matikan).
+2. **Langganan dinyalakan sendiri oleh responden** di Beranda (kartu "Pengingat harian", tombol Nyalakan / Nanti saja).
+   - Kartu hanya tampil bila pengingat belum aktif di perangkat itu. "Nanti saja" menyembunyikannya sampai login berikutnya (2026-10-19).
+   - Untuk berhenti, responden mencabut izin notifikasi di pengaturan browser; langganan yang ditolak layanan push (404/410) dihapus otomatis. Endpoint `DELETE /api/respondent/push` tetap tersedia.
    - Disimpan di tabel `push_subscriptions` (migration `push_subscriptions`): `endpoint` unik, `p256dh`, `auth`, `user_agent`, `last_sent_at`.
    - Data ikut terhapus saat baris responden dihapus.
    - Tidak ada data pribadi di tabel ini.

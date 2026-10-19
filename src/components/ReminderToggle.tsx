@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
+import { dismiss, isDismissed } from "@/lib/dismiss";
 
-type State = "loading" | "unsupported" | "ios-install" | "denied" | "off" | "on";
+type State = "loading" | "hidden" | "ios-install" | "denied" | "off";
 
 function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
   const pad = "=".repeat((4 - (base64url.length % 4)) % 4);
@@ -17,8 +18,11 @@ async function currentSubscription() {
 }
 
 /**
- * Pengingat harian lewat Web Push (ADR-011): dinyalakan sendiri oleh responden, bisa dimatikan
- * kapan saja. iPhone hanya mendukung bila aplikasi sudah dipasang di layar utama (iOS 16.4+).
+ * Ajakan menyalakan pengingat harian (Web Push, ADR-011). Hanya tampil bila pengingat belum
+ * aktif di perangkat ini; setelah dinyalakan kartu tidak tampil lagi, dan "Nanti saja"
+ * menyembunyikannya sampai login berikutnya. Untuk berhenti, responden mencabut izin
+ * notifikasi di pengaturan browser; langganan yang ditolak layanan push dihapus otomatis.
+ * iPhone hanya mendukung bila aplikasi sudah dipasang di layar utama (iOS 16.4+).
  */
 export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
   const [state, setState] = useState<State>("loading");
@@ -31,16 +35,18 @@ export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
       window.matchMedia("(display-mode: standalone)").matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone;
     const supported = "serviceWorker" in navigator && "PushManager" in window;
-    if (!supported) return setState(ios && !standalone ? "ios-install" : "unsupported");
-    if (Notification.permission === "denied") return setState("denied");
+    const show = (s: State) => setState(isDismissed("reminder") ? "hidden" : s);
+    if (!supported) return ios && !standalone ? show("ios-install") : setState("hidden");
+    if (Notification.permission === "denied") return show("denied");
     currentSubscription()
       .then(async (s) => {
-        setState(s ? "on" : "off");
+        if (!s) return show("off");
+        setState("hidden");
         // Sinkron ulang ke server: langganan di browser bisa ada tanpa tercatat di server
         // (mis. koneksi putus saat menyalakan). Penyimpanan bersifat upsert, aman diulang.
-        if (s) await api("/api/respondent/push", { body: s.toJSON() });
+        await api("/api/respondent/push", { body: s.toJSON() });
       })
-      .catch(() => setState("off"));
+      .catch(() => show("off"));
   }, []);
 
   async function enable() {
@@ -62,7 +68,7 @@ export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
         await sub.unsubscribe();
         return setError(res.error.message);
       }
-      setState("on");
+      setState("hidden");
     } catch {
       setError("Pengingat belum bisa dinyalakan di perangkat ini. Coba lagi nanti.");
     } finally {
@@ -70,38 +76,26 @@ export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
     }
   }
 
-  async function disable() {
-    setBusy(true);
-    setError(null);
-    try {
-      const sub = await currentSubscription();
-      if (sub) {
-        await api("/api/respondent/push", { method: "DELETE", body: { endpoint: sub.endpoint } });
-        await sub.unsubscribe();
-      }
-      setState("off");
-    } finally {
-      setBusy(false);
-    }
-  }
+  if (state === "loading" || state === "hidden") return null;
 
-  if (state === "loading" || state === "unsupported") return null;
+  const close = () => {
+    dismiss("reminder");
+    setState("hidden");
+  };
 
   return (
     <section className="install-card" aria-label="Pengingat harian">
       <span className="install-emoji" aria-hidden="true">
-        ðŸ””
+        🔔
       </span>
       <div>
-        <strong>Pengingat harian {state === "on" && "aktif"}</strong>
+        <strong>Pengingat harian</strong>
         <p className="small" style={{ margin: "0.15rem 0 0" }}>
           {state === "ios-install"
-            ? "Di iPhone, pasang PantauManis di layar utama dulu (Bagikan â¬† â†’ Tambah ke Layar Utama), lalu buka dari ikonnya untuk menyalakan pengingat."
+            ? "Di iPhone, pasang PantauManis di layar utama dulu (Bagikan ⬆ → Tambah ke Layar Utama), lalu buka dari ikonnya untuk menyalakan pengingat."
             : state === "denied"
               ? "Notifikasi diblokir di browser ini. Izinkan notifikasi untuk PantauManis di pengaturan browser bila ingin diingatkan."
-              : state === "on"
-                ? "Kami mengingatkan pukul 19.00 WIB bila hari itu kamu belum mencatat."
-                : "Dapat pengingat pukul 19.00 WIB bila hari itu kamu belum mencatat."}
+              : "Dapat pengingat pukul 19.00 WIB bila hari itu kamu belum mencatat."}
         </p>
         {error && (
           <p className="field-error" role="alert">
@@ -109,24 +103,16 @@ export function ReminderToggle({ vapidKey }: { vapidKey: string }) {
           </p>
         )}
       </div>
-      {(state === "off" || state === "on") && (
-        <div className="row">
-          {state === "off" ? (
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              onClick={enable}
-              disabled={busy}
-            >
-              Nyalakan pengingat
-            </button>
-          ) : (
-            <button type="button" className="btn btn-sm" onClick={disable} disabled={busy}>
-              Matikan
-            </button>
-          )}
-        </div>
-      )}
+      <div className="row">
+        {state === "off" && (
+          <button type="button" className="btn btn-primary btn-sm" onClick={enable} disabled={busy}>
+            Nyalakan pengingat
+          </button>
+        )}
+        <button type="button" className="btn btn-sm" onClick={close}>
+          Nanti saja
+        </button>
+      </div>
     </section>
   );
 }
