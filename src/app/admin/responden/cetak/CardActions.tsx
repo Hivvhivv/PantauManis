@@ -3,18 +3,11 @@
 import { useState } from "react";
 import { Icon } from "@/components/Icon";
 
-/**
- * Dua mode cetak lewat dialog browser:
- * - "card": kartu potong (beberapa per halaman), untuk dicetak di kertas.
- * - "a4":   satu lembar A4 per responden (template PDF); pilih "Simpan sebagai PDF".
- */
-function printAs(mode: "card" | "a4", fileName: string) {
-  const html = document.documentElement;
+/** Cetak kartu potong lewat dialog browser; judul dokumen menjadi nama file bawaan. */
+function printCards(fileName: string) {
   const title = document.title;
-  html.dataset.print = mode;
-  document.title = fileName; // nama file bawaan saat "Simpan sebagai PDF"
+  document.title = fileName;
   const restore = () => {
-    delete html.dataset.print;
     document.title = title;
     window.removeEventListener("afterprint", restore);
   };
@@ -22,19 +15,24 @@ function printAs(mode: "card" | "a4", fileName: string) {
   window.print();
 }
 
-export function CardActions({ fileName, code }: { fileName: string; code: string | null }) {
+export function CardActions({
+  fileName,
+  pdfHref,
+  code,
+}: {
+  fileName: string;
+  /** PDF dibuat di server (satu halaman A4 per responden), langsung terunduh. */
+  pdfHref: string;
+  code: string | null;
+}) {
   return (
     <div className="stack card-actions">
-      <button
-        type="button"
-        className="btn btn-primary btn-lg"
-        onClick={() => printAs("card", fileName)}
-      >
+      <button type="button" className="btn btn-primary btn-lg" onClick={() => printCards(fileName)}>
         <Icon name="printer" /> Cetak Kartu
       </button>
-      <button type="button" className="btn btn-lg" onClick={() => printAs("a4", fileName)}>
+      <a className="btn btn-lg" href={pdfHref} download>
         <Icon name="download" /> Download PDF
-      </button>
+      </a>
       {code && <CopyButton text={code} label="Salin Kode" large />}
       <div className="security-note">
         <Icon name="shield" />

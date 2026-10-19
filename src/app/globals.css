@@ -2820,72 +2820,6 @@ a.edu-card:hover {
   background: var(--success-bg);
   color: var(--success-text);
 }
-/* Lembar A4 hanya untuk "Download PDF". */
-.a4-sheets {
-  display: none;
-}
-.a4-sheet {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  /* < area cetak A4 (297 − 2×12 mm) agar satu lembar = satu halaman. */
-  height: 262mm;
-  padding: 18mm 16mm 12mm;
-  background: #fffaf3;
-  color: #3a2c22;
-  text-align: center;
-}
-.a4-leaf {
-  position: absolute;
-  width: 70mm;
-  height: 70mm;
-  border-radius: 0 100% 0 100%;
-  background: #f3e3d0;
-  opacity: 0.8;
-}
-.a4-leaf.tl {
-  top: -25mm;
-  left: -25mm;
-}
-.a4-leaf.br {
-  right: -25mm;
-  bottom: -25mm;
-}
-.a4-head {
-  display: grid;
-  justify-items: center;
-  gap: 0.4rem;
-}
-.a4-head .logo {
-  text-align: left;
-}
-.a4-head h2 {
-  margin: 0.75rem 0 0;
-  font-size: 1.9rem;
-}
-.a4-head p {
-  margin: 0;
-  color: #6e5c4e;
-}
-.a4-sheet .id-card {
-  width: 140mm;
-  text-align: left;
-  border: 2px dashed #c98a55;
-  box-shadow: none;
-}
-.a4-foot {
-  margin-top: auto;
-  display: grid;
-  gap: 0.2rem;
-  font-size: 0.8rem;
-  color: #6e5c4e;
-}
-.a4-foot strong {
-  color: #9c5b2e;
-}
 
 @media print {
   .no-print,
@@ -2908,20 +2842,6 @@ a.edu-card:hover {
   }
   .print-layout {
     display: block;
-  }
-  html[data-print="a4"] .print-layout,
-  html[data-print="a4"] .crumbs {
-    display: none !important;
-  }
-  html[data-print="a4"] .a4-sheets {
-    display: block;
-  }
-  html[data-print="a4"] .a4-sheet + .a4-sheet {
-    break-before: page;
-  }
-  html[data-print="a4"] .a4-sheet {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
   /* Laporan PDF: setiap responden mulai di halaman baru; warna latar ikut tercetak. */
   @page {

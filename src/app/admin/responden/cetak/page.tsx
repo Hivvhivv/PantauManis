@@ -17,7 +17,8 @@ type Card = Awaited<ReturnType<typeof cardsData>>[number];
 /**
  * Kartu kode: kode, tautan website, dan instruksi singkat. QR hanya berisi tautan halaman masuk,
  * tanpa kode, supaya kode tidak tersimpan di riwayat browser atau log server (ADR-004).
- * "Cetak Kartu" mencetak kartu potong; "Download PDF" mencetak lembar A4 per responden.
+ * "Cetak Kartu" mencetak kartu potong lewat dialog browser; "Download PDF" mengunduh PDF
+ * (satu halaman A4 per responden) yang dibuat di server.
  */
 export default async function PrintCardsPage({
   searchParams,
@@ -65,45 +66,19 @@ export default async function PrintCardsPage({
             ))}
           </div>
           <aside className="no-print">
-            <CardActions fileName={fileName} code={single?.codeForCard ?? null} />
+            <CardActions
+              fileName={fileName}
+              pdfHref={`/api/admin/respondents/cards.pdf${ids.length ? `?${ids.map((i) => `id=${i}`).join("&")}` : ""}`}
+              code={single?.codeForCard ?? null}
+            />
           </aside>
         </div>
       )}
-
-      {/* Template PDF A4: hanya tampil saat "Download PDF". */}
-      <div className="a4-sheets" aria-hidden="true">
-        {cards.map((c) => (
-          <section key={c.id} className="a4-sheet">
-            <span className="a4-leaf tl" />
-            <span className="a4-leaf br" />
-            <header className="a4-head">
-              <Logo size={44} tagline="Pantau minuman manis harian" />
-              <h2>Kartu Kode Responden</h2>
-              <p>Gunakan kartu ini untuk masuk dan mengisi kuesioner PantauManis.</p>
-            </header>
-            <IdCard card={c} qr={qr} loginUrl={loginUrl} printOnly />
-            <footer className="a4-foot">
-              <strong>PantauManis</strong>
-              <span>Satu catatan kecil setiap hari membantu penelitian ini.</span>
-            </footer>
-          </section>
-        ))}
-      </div>
     </>
   );
 }
 
-function IdCard({
-  card,
-  qr,
-  loginUrl,
-  printOnly = false,
-}: {
-  card: Card;
-  qr: string;
-  loginUrl: string;
-  printOnly?: boolean;
-}) {
+function IdCard({ card, qr, loginUrl }: { card: Card; qr: string; loginUrl: string }) {
   return (
     <article className="id-card">
       <header className="id-card-head">
@@ -114,7 +89,7 @@ function IdCard({
         <div className="id-card-label">Kode Akses Responden</div>
         <div className="id-code">
           <span className="mono">{card.codeForCard}</span>
-          {!printOnly && <CopyButton text={card.codeForCard} label={`Salin kode ${card.label}`} />}
+          <CopyButton text={card.codeForCard} label={`Salin kode ${card.label}`} />
         </div>
       </div>
       <div className="id-card-body">
